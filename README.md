@@ -3,131 +3,67 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![GitHub](https://img.shields.io/badge/GitHub-spelech%2FAgenticEngineeringToolbelt-black.svg)](https://github.com/spelech/AgenticEngineeringToolbelt)
 
-> **Standardized architecture guidelines, controls-grade test harnesses, living documentation blueprints, and AI agent skills for high-velocity software engineering.**
+> **Extensible engineering archetypes, architecture standards, controls-grade test harnesses, and AI agent tooling for high-velocity software engineering.**
 
-`AgenticEngineeringToolbelt` codifies Steven T. Pelech's software engineering archetype, design-first workflows, and quality guardrails. It can be directly referenced by AI coding agents (Antigravity, Claude Code, Cursor, OpenClaw, Codex, etc.), linked into an IDE/CLI agent path, or embedded as a git submodule in any target repository.
+`AgenticEngineeringToolbelt` is a modular toolkit designed to establish proven engineering standards, living documentation blueprints, and quality guardrails across projects and AI agent runtimes (Antigravity, Claude Code, Cursor, OpenClaw, Codex, etc.). It can be added as a **Git submodule** in repositories or installed directly into AI agent skill paths.
 
 ---
 
-## 🏛️ Engineering Lifecycle & Architecture
+## 🏛️ Toolbelt Architecture
 
 ```mermaid
 flowchart TD
-    subgraph Conceptualize["1. Conceptualize & Discover (Steven + Agent)"]
-        Vision["💡 Idea & Domain Concepts<br><i>(Steven's Vision)</i>"]
-        Questions["❓ Proactive Questioning & Clarification<br><i>(Agent Requirement Discovery)</i>"]
-        MermaidDocs["📑 Living Architecture & Narrative Specs<br><i>(ARCHITECTURE.md, ADRs)</i>"]
-        Vision --> Questions --> MermaidDocs
+    subgraph Toolbelt["AgenticEngineeringToolbelt Hub"]
+        Archetypes["🏛️ archetypes/<br>Curated engineering profiles & personal styles"]
+        Standards["📐 standards/<br>Core architectural guides & testing patterns"]
+        Skills["🧠 .agents/skills/<br>Executable agent skills & workflows"]
+        Rules["🤖 rules/<br>Drop-in prompt rules (AGENTS.md, GEMINI.md, CLAUDE.md)"]
+        Templates["📦 templates/<br>Generic configs, living docs, CI pipelines, and scripts"]
     end
 
-    subgraph Implementation["2. Extensible Implementation (SOLID & DRY)"]
-        Branch["🌿 Fresh Feature Branch<br><i>(off develop / main)</i>"]
-        Backend["⚙️ Modern .NET / C# Backend<br><i>(Controllers / Minimal APIs, Dapper, Stored Procedures, SQLite WAL)</i>"]
-        Frontend["🎨 React + TypeScript SPA<br><i>(Zustand, Vite, Clean CSS Custom Properties)</i>"]
-        Integrations["🔌 MCP Server & LiteLLM / OpenAI SDK<br><i>(Encrypted Data, Authenticated Endpoints)</i>"]
-        Branch --> Backend & Frontend
-        Backend --> Integrations
+    subgraph Runtimes["Agent & Project Runtimes"]
+        Agents["AI Agents (Antigravity, Claude Code, Cursor)"]
+        Repos["Software Repositories (Git Submodules)"]
     end
 
-    subgraph Verification["3. Controls & Closed-Loop Testing"]
-        Harness["🔬 Controls Test Harnesses<br><i>(Mock Transports, Synthetic STDIO/SSE, Pairwise Matrix)</i>"]
-        Audits["📐 E2E & Layout UX Audits<br><i>(Playwright + playwright-layout-inspector)</i>"]
-        Loop["🔄 Closed-Loop Feedback Verification<br><i>(>80% Code Coverage Target)</i>"]
-        Harness & Audits --> Loop
-    end
-
-    subgraph Delivery["4. CI/CD & Automated Release"]
-        Atomic["💾 Atomic Branch Commits<br><i>(Fine-grained, traceable history)</i>"]
-        PR["🚀 Pull Request & 4-Stage CI Quality Gates<br><i>(Integrity → Tests → Smoke → Security)</i>"]
-        Release["📦 Automated Release & Version Sync<br><i>(commit.sh, verify_release.py)</i>"]
-        Atomic --> PR --> Release
-    end
-
-    MermaidDocs --> Branch
-    Integrations --> Harness
-    Frontend --> Audits
-    Loop --> Atomic
+    Archetypes & Standards --> Skills & Rules
+    Skills --> Agents
+    Rules & Templates --> Repos
 ```
 
 ---
 
-## 🌟 The 12 Core Tenets
+## 📚 Modules & Documentation
 
-1. **Division of Labor & Proactive Questioning**: Steven drives the conceptual vision, architecture, and feature ideas. Because ideas start in his head and evolve, **part of the agent's primary job is to ask insightful clarifying questions** to flesh out requirements and edge cases. We design iteratively—prototyping early, learning from live behavior, and refining.
-2. **Controls, Modeling & Simulation Mindset**: Rooted in a controls engineering and simulation background: systems gravitate towards rich test harnesses, simulated environments (mock transports like `mock_stdio.js`, SSE emulators), loopback tests, and dedicated debug tooling.
-3. **Requirements & Architecture Decision Records (ADRs)**: Requirements use clear narrative acceptance criteria by default. Formal `REQ-xxx` prefixes are reserved for projects where formal ADR (Architecture Decision Record) catalogs are explicitly used.
-4. **Guardrails & Closed-Loop Testing**: Establish tight guardrails via requirements, design plans, and test harnesses with **closed-loop feedback** (executing against running processes and using output metrics to iteratively improve performance, accuracy, and UI stability).
-5. **Fresh Branch & PR Workflow**: All new features and plans start on a **fresh feature branch** off `develop` (or `main`/`master`). Features culminate in a **Pull Request (PR)** where all multi-stage CI gates must pass before merging.
-6. **Atomic Commits**: Create fine-grained, **atomic commits** on the branch with clear messages so history is traceable and progress can be reviewed step-by-step.
-7. **High Code Coverage**: Target **>80% code coverage** with meaningful unit, integration, and E2E test suites.
-8. **SOLID & DRY Modularity**: Heavy emphasis on SOLID principles, small and focused files, and breaking apart multi-concern components. Avoid copy-paste and one-offs—design modules to be reusable, pluggable, and extensible.
-9. **MCP Server First**: If a service exposes an API, the architecture should explicitly consider exposing a **Model Context Protocol (MCP) server** for AI agent integration.
-10. **Security & Encryption by Default**: Encrypt sensitive data at rest and in transit (AES-256-GCM, DPAPI, SQLCipher, Vault) and apply authentication/authorization unless explicitly deemed unnecessary.
-11. **LLM Integration Standard**: When implementing LLM features, standardize on **LiteLLM / OpenAI SDK** compatibility (for unified completions, streaming, embeddings, tool calling, and model routing).
-12. **Automated Documentation & Releases**: Automate documentation generation (catalogs, schemas, API docs), automated version bumping (`bump_version.py`, `commit.sh`), and release pipelines (`verify_release.py`, GitHub Actions) wherever possible. Living `ARCHITECTURE.md` with Mermaid sequence and flow diagrams.
+| Module | Description | Key Documents |
+| :--- | :--- | :--- |
+| [**`archetypes/`**](archetypes/README.md) | Curated engineering profiles and fullstack styles. | • [**Controls Fullstack (.NET + React + SQL)**](archetypes/controls-fullstack-dotnet-react.md) |
+| [**`standards/`**](standards/) | Foundational engineering guidelines and testing patterns. | • [**Master Style Guide**](standards/ENGINEERING_STYLE_GUIDE.md)<br>• [**Testing Harness Patterns**](standards/TESTING_HARNESS_PATTERNS.md)<br>• [**CI/CD Pipeline Blueprint**](standards/CI_CD_PIPELINES.md) |
+| [**`rules/`**](rules/) | Universal rule files for AI coding assistants. | • [**AGENTS.md**](rules/AGENTS.md) (Universal)<br>• [**GEMINI.md**](rules/GEMINI.md) (Antigravity)<br>• [**CLAUDE.md**](rules/CLAUDE.md) (Claude Code) |
+| [**`.agents/skills/`**](.agents/skills/) | Executable agent skill definitions. | • [**engineering-archetype**](.agents/skills/engineering-archetype/SKILL.md) |
+| [**`templates/`**](templates/) | Generic configuration boilerplates, workflows, and scripts. | • `configs/` (`Directory.Build.props`, `vite`, `tsconfig`, `eslint`, `playwright`)<br>• `docs/` (`ARCHITECTURE.md`, `REQUIREMENTS.md`)<br>• `workflows/` (4-stage `ci.yml`, `codeql.yml`)<br>• `scripts/` (`commit.sh`, `verify_release.py`) |
 
 ---
 
-## 📂 Repository Structure
+## 🚀 Quick Start & Integration
 
-```text
-AgenticEngineeringToolbelt/
-├── .agents/
-│   └── skills/
-│       └── engineering-archetype/     # Standalone agent skill definition
-│           └── SKILL.md
-├── rules/                             # System instructions & agent rules
-│   ├── AGENTS.md                      # Universal rule file for repositories
-│   ├── GEMINI.md                      # Rule file for Antigravity / Gemini agents
-│   └── CLAUDE.md                      # Rule file for Claude Code agents
-├── standards/                         # In-depth architectural standards
-│   ├── ENGINEERING_STYLE_GUIDE.md     # Master Style Guide & Architecture Archetype
-│   ├── TESTING_HARNESS_PATTERNS.md    # Controls & closed-loop testing guide
-│   └── CI_CD_PIPELINES.md             # 4-stage GitHub Actions CI/CD blueprint
-├── templates/                         # Generic setup configurations & boilerplates
-│   ├── configs/                       # Directory.Build.props, vite, tsconfig, eslint, playwright
-│   ├── docs/                          # ARCHITECTURE.md, REQUIREMENTS.md, CHANGELOG.md
-│   ├── workflows/                     # ci.yml (4-stage gate), codeql.yml, release.yml
-│   └── scripts/                       # commit.sh (atomic build & bump), verify_release.py
-└── scripts/
-    └── install.sh                     # Symlink / setup helper for agent environments
-```
-
----
-
-## 🚀 How to Use & Integrate
-
-### 1. As a Git Submodule in a Target Repository
-To embed these standards and templates directly into any project:
+### 1. Embed as a Git Submodule
+Add the toolbelt to any repository to provide instant access to templates, rules, and standards:
 ```bash
 git submodule add https://github.com/spelech/AgenticEngineeringToolbelt.git .toolbelt
 git submodule update --init --recursive
-```
-Then create a symlink or include the rule:
-```bash
 ln -sf .toolbelt/rules/AGENTS.md AGENTS.md
 ```
 
-### 2. Adding to AI Agent Environments (Antigravity, Claude Code, Cursor)
-Run the built-in install script to symlink the skill and rules into your local agent directories:
+### 2. Install to Local Agent Skill Registries
+Run the installer script to symlink skills into your agent environments (Antigravity, Claude Code):
 ```bash
 ./scripts/install.sh
 ```
 
-Or manually copy or symlink the skill to your agent skills folder:
-```bash
-# Antigravity / Gemini CLI:
-mkdir -p ~/.gemini/antigravity-cli/skills/
-ln -sf $(pwd)/.agents/skills/engineering-archetype ~/.gemini/antigravity-cli/skills/engineering-archetype
-
-# Claude Code:
-mkdir -p ~/.claude/skills/
-ln -sf $(pwd)/.agents/skills/engineering-archetype ~/.claude/skills/engineering-archetype
-```
-
-### 3. Prompt / Instruction Reference
-Include this snippet in your system prompt or custom instructions:
-> *"Always adhere to Steven T. Pelech's engineering archetype codified in [AgenticEngineeringToolbelt](https://github.com/spelech/AgenticEngineeringToolbelt): ask proactive clarifying questions during design, use modern .NET/C# with Dapper and Stored Procedures over heavy ORMs, React + TypeScript + Zustand + Vite, controls-grade test harnesses (>80% coverage with closed-loop feedback), and 4-stage GitHub Actions CI gates on fresh feature branches."*
+### 3. Agent System Prompt Reference
+To align an AI agent session with an archetype:
+> *"Always adhere to the engineering standards and archetypes codified in [AgenticEngineeringToolbelt](https://github.com/spelech/AgenticEngineeringToolbelt) (see [Controls Fullstack Archetype](https://github.com/spelech/AgenticEngineeringToolbelt/blob/main/archetypes/controls-fullstack-dotnet-react.md))."*
 
 ---
 
