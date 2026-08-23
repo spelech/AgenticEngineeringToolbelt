@@ -9,36 +9,49 @@
 
 ---
 
-## 🏛️ The 12 Core Tenets & Engineering Standards
+## 🏛️ Engineering Lifecycle & Architecture
 
 ```mermaid
 flowchart TD
-    subgraph Workflow["Workflow & Collaboration"]
-        T1["1. Proactive Agent Questioning & Iterative Design"]
-        T5["5. Fresh Branch & PR Discipline"]
-        T6["6. Atomic, Legible Commits"]
-        T12["12. Automated Docs, Commits & Releases"]
+    subgraph Conceptualize["1. Conceptualize & Discover (Steven + Agent)"]
+        Vision["💡 Idea & Domain Concepts<br><i>(Steven's Vision)</i>"]
+        Questions["❓ Proactive Questioning & Clarification<br><i>(Agent Requirement Discovery)</i>"]
+        MermaidDocs["📑 Living Architecture & Narrative Specs<br><i>(ARCHITECTURE.md, ADRs)</i>"]
+        Vision --> Questions --> MermaidDocs
     end
 
-    subgraph Stack["Tech Stack & Architecture"]
-        T8["8. SOLID & DRY (No One-Offs, Extensible Modules)"]
-        T2_stack["2. Modern .NET (C#) & React/TS/Zustand/Vite"]
-        T2_db["2. Relational SQL & Stored Procedures (Dapper > Heavy ORMs)"]
-        T2_api["2. Flexible Controllers & Minimal APIs"]
-        T9["9. MCP-First API Integration"]
-        T10["10. Default Encryption & Authentication"]
-        T11["11. LiteLLM / OpenAI SDK Standard"]
+    subgraph Implementation["2. Extensible Implementation (SOLID & DRY)"]
+        Branch["🌿 Fresh Feature Branch<br><i>(off develop / main)</i>"]
+        Backend["⚙️ Modern .NET / C# Backend<br><i>(Controllers / Minimal APIs, Dapper, Stored Procedures, SQLite WAL)</i>"]
+        Frontend["🎨 React + TypeScript SPA<br><i>(Zustand, Vite, Clean CSS Custom Properties)</i>"]
+        Integrations["🔌 MCP Server & LiteLLM / OpenAI SDK<br><i>(Encrypted Data, Authenticated Endpoints)</i>"]
+        Branch --> Backend & Frontend
+        Backend --> Integrations
     end
 
-    subgraph Testing["Controls Testing & Guardrails"]
-        T2_controls["2. Controls, Modeling & Simulation Mindset"]
-        T4["4. Closed-Loop Test Feedback & Guardrails"]
-        T7["7. >80% Code Coverage Target"]
-        T3["3. Narrative Requirements (REQ-xxx only with ADRs)"]
+    subgraph Verification["3. Controls & Closed-Loop Testing"]
+        Harness["🔬 Controls Test Harnesses<br><i>(Mock Transports, Synthetic STDIO/SSE, Pairwise Matrix)</i>"]
+        Audits["📐 E2E & Layout UX Audits<br><i>(Playwright + playwright-layout-inspector)</i>"]
+        Loop["🔄 Closed-Loop Feedback Verification<br><i>(>80% Code Coverage Target)</i>"]
+        Harness & Audits --> Loop
     end
 
-    Workflow --> Stack --> Testing
+    subgraph Delivery["4. CI/CD & Automated Release"]
+        Atomic["💾 Atomic Branch Commits<br><i>(Fine-grained, traceable history)</i>"]
+        PR["🚀 Pull Request & 4-Stage CI Quality Gates<br><i>(Integrity → Tests → Smoke → Security)</i>"]
+        Release["📦 Automated Release & Version Sync<br><i>(commit.sh, verify_release.py)</i>"]
+        Atomic --> PR --> Release
+    end
+
+    MermaidDocs --> Branch
+    Integrations --> Harness
+    Frontend --> Audits
+    Loop --> Atomic
 ```
+
+---
+
+## 🌟 The 12 Core Tenets
 
 1. **Division of Labor & Proactive Questioning**: Steven drives the conceptual vision, architecture, and feature ideas. Because ideas start in his head and evolve, **part of the agent's primary job is to ask insightful clarifying questions** to flesh out requirements and edge cases. We design iteratively—prototyping early, learning from live behavior, and refining.
 2. **Controls, Modeling & Simulation Mindset**: Rooted in a controls engineering and simulation background: systems gravitate towards rich test harnesses, simulated environments (mock transports like `mock_stdio.js`, SSE emulators), loopback tests, and dedicated debug tooling.
