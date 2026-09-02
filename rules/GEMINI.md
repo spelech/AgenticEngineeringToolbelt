@@ -1,8 +1,11 @@
-# GEMINI.md - Antigravity / Gemini Instructions
+# 🤖 Gemini / Antigravity Agent Configuration
 
-Adhere to Steven T. Pelech's engineering archetype:
-- Proactively ask clarifying questions during initial design.
-- Develop on fresh feature branches with atomic commits; open PRs to run CI gates.
-- Stack: Modern .NET (C#) + Dapper/Stored Procedures (SQL > ORM) + React + TypeScript + Zustand + Vite.
-- Controls Testing: >80% coverage with unit, integration, mock transports, and Playwright layout inspector.
-- Documentation: Mermaid flow & sequence diagrams in `ARCHITECTURE.md`.
+This repository adheres to the architecture, coding standards, test harness conventions, and CI/CD quality gates codified in `AgenticEngineeringToolbelt`.
+
+## 📌 Master Rules Reference
+Always follow all guidelines in [**AGENTS.md**](AGENTS.md) and [**ENGINEERING_STYLE_GUIDE.md**](../standards/ENGINEERING_STYLE_GUIDE.md).
+
+## ⚡ Active Skills
+- `engineering-archetype`: Master architectural standards across C#, Python, TS, and C++.
+- `scaffold-project`: Scaffolds projects with `--defaults` or interactive prompts.
+- `test-harness-builder`: Builds closed-loop simulation harnesses, tap points, and Playwright UI drivers.
