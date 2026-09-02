@@ -1,62 +1,77 @@
 ---
 name: engineering-archetype
-description: Architectural guidelines and setup reference for Steven T. Pelech's engineering archetype (Modern .NET/C# Minimal APIs/Controllers, Dapper/Stored Procedures, React + Zustand + Vite, controls-grade test harnesses, Playwright Layout Inspector, and 4-stage GitHub Actions CI/CD).
+description: Architectural guidelines and master engineering standards for Steven T. Pelech's engineering archetypes across C#, TypeScript, Python, and C++.
 ---
 
-# Engineering Archetype & Collaboration Skill
+# Engineering Archetype & Master Guidelines
 
-This skill equips agents to assist Steven T. Pelech across new project setups, feature development, and architectural refactoring.
+This skill equips agents to collaborate effectively with Steven T. Pelech across new project setups, feature development, test harness creation, and architectural refactoring.
 
-## 🤝 Division of Responsibility & Working Model
+---
+
+## 🤝 1. Division of Responsibility & Collaboration
 
 - **Steven's Role**: System architecture, structural design, feature conceptualization, domain modeling, requirement specifications, stored procedure/data design, and Mermaid diagram designs.
-- **Agent's Role**: 
-  - **Proactive Questioning**: Ask insightful clarifying questions to flesh out requirements and edge cases since Steven's ideas evolve during design.
+- **Agent's Role**:
+  - **Proactive Questioning**: Ask insightful clarifying questions to flesh out requirements, edge cases, and design constraints since Steven's ideas evolve during design.
   - **Iterative Prototyping**: Build prototypes, run test harnesses with closed-loop feedback, and iterate based on empirical findings.
-  - **Branch & PR Discipline**: Work on fresh feature branches off `develop`/`main`, make fine-grained atomic commits, and open PRs that pass all CI quality gates.
+  - **Branch & PR Discipline**: Work on fresh feature branches off `develop`, make fine-grained Conventional Commits (`feat:`, `fix:`, `test:`), and open PRs that pass all 4-stage CI quality gates before merging into `develop`/`main`.
 
 ---
 
-## 🏛️ Core Tech Stack & Design Idioms
+## 🏛️ 2. Core Driving Principles & Code Discipline
 
-### 1. SOLID, DRY & Extensibility
-- Heavy emphasis on SOLID principles, modular file size, and breaking apart multi-concern components.
-- Avoid one-offs and duplicate code; design for pluggability and reusability.
+1. **SOLID & Modularity**:
+   - Strict single responsibility per class/module.
+   - Decompose classes exceeding **500 lines of code** into partial classes or distinct sub-services.
+   - Build client-focused interfaces (`I*` in C#) even for single implementations to ensure 100% testability.
+2. **DRY vs. YAGNI & KISS**:
+   - **Rule of Three**: Duplication is acceptable across 2 instances; abstract on the **3rd occurrence**.
+   - Do not invent speculative multi-tier frameworks or unused generic abstractions (YAGNI).
+3. **Semantic Naming Standard**:
+   - **Banned**: `*Manager`, `*Helper`, `*Util`, `*Data` junk drawers.
+   - **Enforced**: Role/action-based names (`DatabaseSeederService`, `UserAuthenticator`, `OrderProcessor`, `ServerStatusCard`, `use*Store.ts`).
+4. **Efficiency & Performance**:
+   - **Database**: Consolidate into a single **Stored Procedure** or multi-result query rather than making 3+ database round-trips.
+   - **Frontend**: Mandatory **granular Zustand selectors** (`useServerStore(s => s.servers.length)`) to prevent render cascades.
+   - **API**: Provide focused individual HTTP endpoints for decoupled store/component lifecycles.
+5. **Error Handling & Diagnostics**:
+   - Never leak raw stack traces to API clients.
+   - Log rich debug payloads containing the input arguments and state that triggered the error to enable deterministic reproduction.
 
-### 2. Backend Architecture (Modern .NET / C#)
-- **Runtime**: Modern .NET with `<Nullable>enable</Nullable>`, `<ImplicitUsings>enable</ImplicitUsings>`, and `.slnx` solution format.
-- **Persistence Philosophy**: Relational SQL (SQLite WAL, MS SQL, MySQL) over NoSQL or heavy ORMs (like Entity Framework Core).
-  - Use **Dapper** / ADO.NET with **Stored Procedures** where appropriate (e.g. security evaluation, audit logging, batch operations) and parameterized queries with `IDbConnectionFactory`.
-  - Enable SQLite WAL mode where applicable (`PRAGMA journal_mode = WAL;`).
-  - **No Heavy ORMs**: Do not introduce Entity Framework Core or NoSQL document databases unless explicitly requested.
-- **API Architecture**: Choose pragmatically between **Controllers** (`[ApiController]`) for rich domain slices and **Minimal APIs** (`Map*Endpoints()`) for lightweight routing and streaming.
-- **MCP Server First**: If exposing an API, consider exposing a Model Context Protocol (MCP) server for agent integration.
-- **Security**: Encrypt sensitive data at rest and in transit (AES-256-GCM, DPAPI, SQLCipher, Vault) and apply auth by default.
-- **LLM Integration**: Standardize on LiteLLM / OpenAI SDK compatibility.
-- **Resilience**: Thread-safe state machines (`ConcurrentDictionary`, `PendingRequestTcs`), full `CancellationToken` propagation.
+---
 
-### 3. Frontend Architecture (React / TypeScript / Zustand / Vite)
-- **Stack**: React, TypeScript in strict mode (`strict: true`), Vite.
-- **State Management**: **Zustand** stores (`use*Store.ts`) with focused state slices and selector hooks.
-- **Linter Policy**: Zero linter warnings permitted (`eslint . --max-warnings 0`).
-- **Styling**: CSS custom properties and theme tokens with dark mode support. Avoid heavy UI library bloat.
+## 💻 3. Polyglot Language Matrix
 
-### 4. Controls & Simulation Testing Harnesses (>80% Target)
-- **Controls Mindset**: Test harnesses, simulated mock transports (`mock_stdio.js`), debug tooling, and closed-loop feedback testing.
-- **Code Coverage**: Target **>80% code coverage** across unit, integration, and E2E suites.
-- **E2E & Layout UX**: Playwright paired with `playwright-layout-inspector` to audit:
-  - Zero horizontal overflow (`expect(page).toHaveNoLayoutOverflow()`)
-  - Mobile viewport fit & zoom accessibility (`expect(page).toHaveMobileFit()`)
-  - Touch ergonomics (`expect(page).toHaveTouchFriendlyTargets({ minSize: 24 })`)
-  - Composite UX score (`expect(page).toPassLayoutAudit({ minScore: 85 })`)
+| Language | Primary Domains | Core Conventions & Libraries |
+| :--- | :--- | :--- |
+| **C# (.NET 9)** | High-perf systems, control planes, protocols, daemons, native UIs | `System.CommandLine`, full DI, `.slnx`, Dapper + Stored Proc `.sql` files, SQLite WAL (MySQL-like) / MSSQL, Native WPF/WinForms/Avalonia (no Electron), `ConcurrentDictionary`, `Channel<T>`, `SemaphoreSlim`, `Interlocked`, `CancellationToken` throughout. |
+| **Python (3.12+)** | Scrapers, data pipelines, vision, ML, automation | `uv`, `pyproject.toml`, FastAPI + FastMCP (Streamable HTTP / SSE), Pydantic v2 schemas, `asyncio`, `pytest` ($\ge$ 80% coverage), `ruff`. |
+| **TypeScript / React** | Web UIs, interactive dashboards, browser tools | React + TS strict + Vite, Zustand domain stores, pure CSS Modules + custom properties, bespoke components, `playwright-layout-inspector` 4-point audit. |
+| **C++ (C++20/23)** | Algorithms, geometry, native compute, low-level protocol engines | MSBuild (Win) / CMake (Linux), `vcpkg`, strict RAII, smart pointers, GoogleTest (`gtest`), ASan/UBSan, Google Benchmark, C# `[LibraryImport]` / Python `pybind11` interop. |
 
-### 5. Living Documentation & Automation
-- `ARCHITECTURE.md`: Mermaid flowchart (`flowchart TD`) and numbered sequence diagram (`sequenceDiagram autonumber`).
-- Requirements: Narrative acceptance criteria by default; formal `REQ-xxx` prefixes only when ADR documents are present.
-- Automated release scripts: `commit.sh` and `verify_release.py`.
+---
 
-### 6. Multi-Stage GitHub Actions CI/CD (4-Stage Gate)
-1. **Gate 1: Release & Link Integrity**: Python `verify_release.py` checking semver sync and markdown link integrity.
-2. **Gate 2: Parallel Builds & Tests**: Backend Release build + xUnit coverage (>80%); Frontend ESLint (0-warn) + Vitest.
-3. **Gate 3: Fullstack Integration Smoke**: Background server spawn + `/health` probe loop + live SSE/HTTP handshake.
-4. **Gate 4: Security & Release**: CodeQL multi-language analysis + Docker publish.
+## 🧪 4. Controls & Simulation Testing Framework
+
+1. **Harness Trigger**: Build a dedicated test harness as soon as a project crosses an architectural boundary (API, network, process) or enters algorithm domains with tunable variability.
+2. **High-Volume & Closed-Loop Simulation**: Harnesses execute high-volume throughput stress loops, parameter sweeps, and convergence tests.
+3. **Disturbance Ingestion**: Inject malformed payloads and abrupt disconnects to verify error fallbacks and clean `CancellationToken` teardowns.
+4. **Frontend UI Harness**: Include `data-testid` attributes and Playwright drivers for autonomous agent inspection.
+5. **Agent Feedback Envelope**: Format all test failures with:
+   - `inputs` & `assumptions`
+   - `active_settings`
+   - `action_history` (state transitions)
+   - `output_delta` (expected vs actual)
+   - `captured_logs`
+   - `reproduction_command`
+6. **Coverage**: Maintain $\ge$ 80% code coverage.
+
+---
+
+## 🚀 5. Multi-Stage GitHub Actions CI/CD (4-Stage Gate)
+
+1. **Gate 1: Release & Link Integrity**: `verify_release.py` verifying SemVer across manifests and relative markdown link integrity.
+2. **Gate 2: Parallel Builds & Tests**: Backend build + xUnit/pytest/gtest coverage ($\ge$ 80%); Frontend ESLint (0 warnings) + Vitest.
+3. **Gate 3: Fullstack Smoke Gate**: Live background process spawn + `/health` probe loop + live handshake.
+4. **Gate 4: Security & Release**: CodeQL multi-language analysis + Docker multi-platform container publish.
