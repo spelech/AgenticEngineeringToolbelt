@@ -74,4 +74,4 @@ This skill equips agents to collaborate effectively with Steven T. Pelech across
 1. **Gate 1: Release & Link Integrity**: `verify_release.py` verifying SemVer across manifests and relative markdown link integrity.
 2. **Gate 2: Parallel Builds & Tests**: Backend build + xUnit/pytest/gtest coverage ($\ge$ 80%); Frontend ESLint (0 warnings) + Vitest.
 3. **Gate 3: Fullstack Smoke Gate**: Live background process spawn + `/health` probe loop + live handshake.
-4. **Gate 4: Security & Release**: CodeQL multi-language analysis + Docker multi-platform container publish.
+4. **Gate 4: Security & Release**: CodeQL multi-language analysis + Docker container publish (`linux/amd64`).

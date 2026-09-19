@@ -15,6 +15,9 @@ Mandatory architectural guidelines and execution rules for AI coding assistants.
 3. **Container Immutability**:
    - **NEVER** edit files or hot-patch code inside live running containers.
    - Always build/pull official images or rebuild via standard compose commands (`docker compose up -d --build`).
+4. **Container Target Architecture**:
+   - Standardize strictly on native `linux/amd64` for all container builds and CI workflows.
+   - **DO NOT** include QEMU emulation or multi-architecture (`arm64`) build steps in CI/CD pipelines.
 
 ---
 

@@ -27,7 +27,7 @@ flowchart LR
 
     subgraph S4["Stage 4: Security & Release"]
         G4A["CodeQL Multi-Language Analysis"]
-        G4B["Docker Multi-Arch Container Publish"]
+        G4B["Docker Container Publish (linux/amd64)"]
     end
 
     Commit --> G1
@@ -55,4 +55,4 @@ Spawns the built backend and frontend in the background, probes the `/health` en
 
 ### Stage 4: Security & Release
 - Runs **CodeQL** static analysis across C# and TypeScript codebases.
-- Builds and publishes multi-architecture Docker containers to GitHub Container Registry (GHCR) upon successful main branch builds or semver tags.
+- Builds and publishes native `linux/amd64` Docker containers to GitHub Container Registry (GHCR) upon successful main branch builds or semver tags without QEMU emulation overhead.
