@@ -7,15 +7,29 @@ Mandatory architectural guidelines and execution rules for AI coding assistants.
 ## 🤝 1. Collaboration & Workflow Discipline
 
 1. **Proactive Clarifying Questions**: Steven's conceptual designs evolve during development. **Always ask insightful clarifying questions** to nail down requirements, edge cases, and architectural constraints.
-2. **Git Branch & Release Flow**:
-   - All new features and refactors start on a **fresh feature branch** off `develop`.
-   - `develop` serves as the active integration branch before production release on `main`.
+2. **Traditional Git Flow Discipline**:
+   - `main`: Production tagged releases only (`vX.Y.Z`). Every commit represents a verified release. Direct pushes are protected and forbidden.
+   - `develop`: Primary integration branch for ongoing work. Feature branches merge here through Pull Requests.
+   - `feature/*`: Dedicated branches created off `develop` (`feature/feature-name`). Contains isolated unit and functional work. Merges back to `develop` after Tier 2 and Tier 3 gates pass.
+   - `release/*`: Created off `develop` (`release/vX.Y.Z`) when features freeze for an upcoming release. Dedicated to version bumping, changelog finalization, and release verification. Merges into `main` (with release tag) and syncs back to `develop`.
+   - `hotfix/*`: Created directly off `main` (`hotfix/vX.Y.Z`) to address critical production defects. Merges into both `main` (with release tag) and `develop`.
    - Create **atomic Conventional Commits** (`feat:`, `fix:`, `test:`, `docs:`, `chore:`).
    - Features must culminate in a PR passing all 4-stage CI quality gates before merging.
-3. **Container Immutability**:
+3. **Living Documentation & ASD-STE100**:
+   - Write all user-facing documentation, README files, architectural specs, and living guides adhering strictly to **ASD-STE100 (Simplified Technical English)** principles:
+     - Keep sentences short, concise, and direct ($\le$ 20-25 words per sentence).
+     - Use active voice and imperative mood for instructions.
+     - Eliminate ambiguous jargon, colloquialisms, and redundant synonyms; maintain one core instruction per sentence.
+   - Render architecture, sequence, state, and Git branching diagrams using native **Mermaid syntax** (`flowchart TD`, `sequenceDiagram autonumber`, `stateDiagram-v2`, `gitGraph`).
+   - Host and publish project living documentation via **VitePress** deployed to GitHub Pages.
+4. **APIs First, MCP Later**:
+   - Domain logic and workflows must reside in clean, fully typed, self-contained libraries and REST/gRPC APIs before exposing them via Model Context Protocol (MCP).
+   - MCP tools act strictly as lightweight wrappers that forward requests to underlying service interfaces.
+   - Core capabilities must remain 100% testable and operable through CLI, direct API calls, or unit test harnesses without requiring MCP.
+5. **Container Immutability**:
    - **NEVER** edit files or hot-patch code inside live running containers.
    - Always build/pull official images or rebuild via standard compose commands (`docker compose up -d --build`).
-4. **Container Target Architecture**:
+6. **Container Target Architecture**:
    - Standardize strictly on native `linux/amd64` for all container builds and CI workflows.
    - **DO NOT** include QEMU emulation or multi-architecture (`arm64`) build steps in CI/CD pipelines.
 
@@ -51,8 +65,14 @@ Mandatory architectural guidelines and execution rules for AI coding assistants.
 
 ## 🧪 4. Testing & Agent Verification Protocol
 
-1. **Test Harnesses**: Build closed-loop simulation harnesses with high-volume testing loops whenever crossing API/network boundaries or building tunable algorithms.
-2. **Coverage**: Maintain $\ge$ 80% code coverage across unit, integration, and E2E suites.
-3. **UI Layout Inspection**: Frontends must pass the 4-point `playwright-layout-inspector` audit (no overflow, mobile fit, $\ge$ 24px targets, $\ge$ 85 score) with `data-testid` attributes.
-4. **6-Part Agent Feedback Envelope**: Format harness/test failures with `inputs`, `assumptions`, `active_settings`, `action_history`, `output_delta`, `captured_logs`, and `reproduction_command`.
-5. **Empirical Verification**: Never claim a task complete without running build, tests, verifying logs, and probing `/health`.
+1. **Software as an Observable Dynamic System**:
+   - Model critical workflows, boundary crossings, and stateful protocols with diagnostic tap points, metrics, and health probes.
+   - Build closed-loop simulation harnesses with high-volume testing loops, parameter sweeps, and synthetic disturbance ingestion.
+2. **Tiered Testing Cadence ("Test When It Makes Sense")**:
+   - **Tier 1 (Inner Loop / Rapid Dev)**: Fast, isolated in-memory unit tests on demand. No mandatory test suite runs during early exploratory prototyping or drafting.
+   - **Tier 2 (Stabilization Gate / Pre-Manual Verification)**: Run unit test suites and targeted integration tests once feature interfaces and domain boundaries stabilize, immediately prior to developer or agent manual testing.
+   - **Tier 3 (Pre-PR / Pre-Release / CI Quality Gate)**: Full test matrix, multi-provider integration tests, simulation stress loops, and Playwright layout audits run before merging to `develop`/`main` and in CI.
+3. **Coverage Target**: Maintain $\ge$ 80% code coverage across unit, integration, and E2E suites.
+4. **UI Layout Inspection**: Frontends must pass the 4-point `playwright-layout-inspector` audit (no overflow, mobile fit, $\ge$ 24px targets, $\ge$ 85 score) with `data-testid` attributes.
+5. **6-Part Agent Feedback Envelope**: Format harness/test failures with `inputs`, `assumptions`, `active_settings`, `action_history`, `output_delta`, `captured_logs`, and `reproduction_command`.
+6. **Empirical Verification**: Never claim a task complete without running build, tests, verifying logs, and probing `/health`.
