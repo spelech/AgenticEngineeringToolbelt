@@ -1,3 +1,8 @@
+---
+title: "Archetype: C++ Native Algorithms"
+description: "Deterministic memory management, SIMD, and vcpkg algorithm packages."
+---
+
 # ⚡ Archetype: Modern C++ Native Systems & Algorithms
 
 > **Target Domain**: High-performance compute, geometric modeling, vision processing, low-level protocol engines, and native libraries with C# / Python interop.

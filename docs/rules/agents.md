@@ -1,3 +1,8 @@
+---
+title: "Universal Agent Rules (AGENTS.md)"
+description: "Universal instructions for AI agents working across Pelech engineering repositories."
+---
+
 # 🤖 Universal AGENTS.md
 
 Mandatory architectural guidelines and execution rules for AI coding assistants.

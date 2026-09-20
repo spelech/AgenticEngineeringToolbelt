@@ -1,9 +1,14 @@
-# 🤖 Gemini / Antigravity Agent Configuration
+---
+title: "Claude Code Guidelines (CLAUDE.md)"
+description: "Claude Code runtime guidelines, command rules, and verification standards."
+---
+
+# 🤖 Claude Code Agent Configuration
 
 This repository adheres to the architecture, coding standards, test harness conventions, and CI/CD quality gates codified in `AgenticEngineeringToolbelt`.
 
 ## 📌 Master Rules Reference
-Always follow all guidelines in [**AGENTS.md**](AGENTS.md) and [**ENGINEERING_STYLE_GUIDE.md**](../standards/ENGINEERING_STYLE_GUIDE.md).
+Always follow all guidelines in [**AGENTS.md**](/rules/agents) and [**Engineering Style Guide**](/standards/engineering-style-guide).
 
 ## ⚡ Active Skills
 - `engineering-archetype`: Master architectural standards across C#, Python, TS, and C++.

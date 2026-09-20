@@ -37,7 +37,7 @@ flowchart TD
 
 | Module | Description | Key Documents |
 | :--- | :--- | :--- |
-| [**`archetypes/`**](archetypes/README.md) | Curated polyglot engineering profiles. | • [**Controls Fullstack (.NET + React + SQL)**](archetypes/controls-fullstack-dotnet-react.md)<br>• [**C# Console & CLI**](archetypes/console-cli-dotnet.md)<br>• [**Python FastAPI & FastMCP**](archetypes/python-fastapi-mcp.md)<br>• [**React + TS + Vite UI**](archetypes/react-ts-vite-ui.md)<br>• [**Modern C++ Native Systems**](archetypes/native-cpp-algorithms.md) |
+| [**`archetypes/`**](archetypes/README.md) | Curated polyglot engineering profiles. | • [**Fullstack (.NET + React + SQL)**](archetypes/fullstack-dotnet-react.md)<br>• [**C# Console & CLI**](archetypes/console-cli-dotnet.md)<br>• [**Python FastAPI & FastMCP**](archetypes/python-fastapi-mcp.md)<br>• [**React + TS + Vite UI**](archetypes/react-ts-vite-ui.md)<br>• [**Modern C++ Native Systems**](archetypes/native-cpp-algorithms.md) |
 | [**`standards/`**](standards/) | Foundational engineering guidelines and testing patterns. | • [**Master Style Guide**](standards/ENGINEERING_STYLE_GUIDE.md)<br>• [**Testing Harness Patterns**](standards/TESTING_HARNESS_PATTERNS.md)<br>• [**CI/CD Pipeline Blueprint**](standards/CI_CD_PIPELINES.md) |
 | [**`rules/`**](rules/) | Universal rule files for AI coding assistants. | • [**AGENTS.md**](rules/AGENTS.md) (Universal)<br>• [**GEMINI.md**](rules/GEMINI.md) (Antigravity)<br>• [**CLAUDE.md**](rules/CLAUDE.md) (Claude Code) |
 | [**`.agents/skills/`**](.agents/skills/) | Executable agent skill definitions. | • [**`engineering-archetype`**](.agents/skills/engineering-archetype/SKILL.md)<br>• [**`scaffold-project`**](.agents/skills/scaffold-project/SKILL.md)<br>• [**`test-harness-builder`**](.agents/skills/test-harness-builder/SKILL.md) |
@@ -47,7 +47,25 @@ flowchart TD
 
 ## 🚀 Quick Start & Integration
 
-### 1. Embed as a Git Submodule
+### 1. Traditional Git Flow Model
+All repositories adopting the toolbelt adhere to traditional Git Flow:
+- **`main`**: Production tagged releases (`vX.Y.Z`). Protected branch; no direct commits.
+- **`develop`**: Integration branch for day-to-day feature work and agent iterations.
+- **`feature/*`**: Dedicated feature branches off `develop`. Merges back to `develop` via PR.
+- **`release/*`**: Stabilization, version bumping, and changelog finalization off `develop`, merging to both `main` and `develop`.
+- **`hotfix/*`**: Urgent production fixes branching off `main`, merging to `main` and `develop`.
+
+```bash
+# Start a new feature
+git checkout develop
+git pull origin develop
+git checkout -b feature/observable-simulation-engine
+
+# Complete feature with conventional commits & merge through PR
+git commit -m "feat(engine): add closed-loop simulation harness with tap points"
+```
+
+### 2. Embed as a Git Submodule
 Add the toolbelt to any repository to provide instant access to templates, rules, and standards:
 ```bash
 git submodule add https://github.com/spelech/AgenticEngineeringToolbelt.git .toolbelt
@@ -55,18 +73,26 @@ git submodule update --init --recursive
 ln -sf .toolbelt/rules/AGENTS.md AGENTS.md
 ```
 
-### 2. Install to Local Agent Skill Registries
+### 3. Install to Local Agent Skill Registries
 Run the installer script to symlink skills into your agent environments (Antigravity, Claude Code, Workspace):
 ```bash
 ./scripts/install.sh
 ```
 
-### 3. Agent System Prompt Reference
+### 4. Living Documentation Site (VitePress)
+Host and browse project documentation, archetypes, and standards using VitePress:
+```bash
+npm install && npm run docs:dev
+```
+Deployments automatically publish to GitHub Pages via the 4-stage CI/CD pipeline.
+
+### 5. Agent System Prompt Reference
 To align an AI agent session with an archetype:
-> *"Always adhere to the engineering standards and archetypes codified in [AgenticEngineeringToolbelt](https://github.com/spelech/AgenticEngineeringToolbelt) (see [Master Engineering Style Guide](https://github.com/spelech/AgenticEngineeringToolbelt/blob/main/standards/ENGINEERING_STYLE_GUIDE.md))."*
+> *"Always adhere to the engineering standards and archetypes codified in [AgenticEngineeringToolbelt](https://github.com/spelech/AgenticEngineeringToolbelt) (see [Master Engineering Style Guide](standards/ENGINEERING_STYLE_GUIDE.md))."*
 
 ---
 
 ## 📄 License
 
 MIT © [Steven T. Pelech](LICENSE)
+
