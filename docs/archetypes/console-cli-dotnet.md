@@ -1,3 +1,8 @@
+---
+title: "Archetype: .NET Console & CLI"
+description: "Production-grade CLI utilities with Specter.Console and command routing."
+---
+
 # 🏛️ Archetype: C# Console & CLI Application
 
 > **Target Domain**: High-performance command-line utilities, background daemons, developer tools, batch workers, and protocol runners.

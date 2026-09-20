@@ -1,3 +1,8 @@
+---
+title: "Simulation & Control Harnesses"
+description: "Observable dynamic systems, diagnostic tap points, parameter sweeps, and 6-part feedback envelopes."
+---
+
 # 🧪 Simulation & Control Harnesses: Observation, Testing & Feedback for Developers and AI
 
 This guide defines the simulation architecture, test harness conventions, and closed-loop verification practices that ensure software stability, deterministic performance, and $\ge$ 80% code coverage.

@@ -1,3 +1,8 @@
+---
+title: "Multi-Stage CI/CD Pipelines"
+description: "4-stage quality gate architecture, Git Flow triggers, and living documentation deployment."
+---
+
 # 🚀 Multi-Stage GitHub Actions CI/CD Pipeline Blueprint
 
 This document details the standardized 4-stage GitHub Actions CI/CD architecture deployed across projects. It codifies Git Flow triggers, quality gates, and automated living documentation deployment.

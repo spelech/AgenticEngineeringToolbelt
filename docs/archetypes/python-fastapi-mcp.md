@@ -1,3 +1,8 @@
+---
+title: "Archetype: Python FastAPI & FastMCP"
+description: "APIs First, MCP Later architecture with typed FastAPI endpoints and MCP tools."
+---
+
 # 🐍 Archetype: Python FastAPI & FastMCP Service (APIs First, MCP Later)
 
 > **Architect**: Steven T. Pelech  

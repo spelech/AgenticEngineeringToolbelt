@@ -1,3 +1,8 @@
+---
+title: "Master Engineering Style Guide"
+description: "Core engineering principles, polyglot standards, Git Flow, and test harness conventions."
+---
+
 # 🏛️ Master Engineering Style Guide & Architecture Archetype
 
 This document codifies the core engineering principles, architectural patterns, polyglot language standards, test harness conventions, and living documentation practices established across Steven T. Pelech's repositories and agent workflows.

@@ -1,9 +1,14 @@
+---
+title: "Antigravity & Gemini CLI (GEMINI.md)"
+description: "Google Antigravity and Gemini CLI engineering standards and execution rules."
+---
+
 # 🤖 Gemini / Antigravity Agent Configuration
 
 This repository adheres to the architecture, coding standards, test harness conventions, and CI/CD quality gates codified in `AgenticEngineeringToolbelt`.
 
 ## 📌 Master Rules Reference
-Always follow all guidelines in [**AGENTS.md**](AGENTS.md) and [**ENGINEERING_STYLE_GUIDE.md**](../standards/ENGINEERING_STYLE_GUIDE.md).
+Always follow all guidelines in [**AGENTS.md**](/rules/agents) and [**Engineering Style Guide**](/standards/engineering-style-guide).
 
 ## ⚡ Active Skills
 - `engineering-archetype`: Master architectural standards across C#, Python, TS, and C++.
