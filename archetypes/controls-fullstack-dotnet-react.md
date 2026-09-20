@@ -41,7 +41,7 @@ flowchart LR
 7. **High Code Coverage**: Target **>80% code coverage** with meaningful unit, integration, and E2E test suites.
 8. **SOLID & DRY Modularity**: Heavy emphasis on SOLID principles, small and focused files ($\le$ 500 LOC), and breaking apart multi-concern components. Avoid copy-paste and one-offs—design modules to be reusable, pluggable, and extensible.
 9. **APIs First, MCP Later**: Domain logic, models, schemas, and persistence live in typed, self-contained APIs (Minimal APIs or Controllers) first. Expose Model Context Protocol (MCP) server tools as lightweight wrapper adapters second for AI agent integration.
-10. **Security & Encryption by Default**: Encrypt sensitive data at rest and in transit (AES-256-GCM, DPAPI, SQLCipher, Vault) and apply authentication/authorization unless explicitly deemed unnecessary.
+10. **Security & Encryption by Default**: Encrypt sensitive data at rest and in transit via self-contained symmetric encryption (AES-256-GCM, avoiding OS-locked DPAPI/Vault dependencies) and apply authentication/authorization unless explicitly deemed unnecessary.
 11. **LLM Integration Standard**: When implementing LLM features, standardize on **LiteLLM / OpenAI SDK** compatibility (for unified completions, streaming, embeddings, tool calling, and model routing).
 12. **Automated Documentation & Releases**: Automate documentation generation (catalogs, schemas, API docs), automated version bumping (`bump_version.py`, `commit.sh`), and release pipelines (`verify_release.py`, GitHub Actions) wherever possible. Living documentation with Mermaid sequence and flow diagrams, conforming to ASD-STE100.
 
@@ -85,7 +85,7 @@ Testing adheres to the **Tiered Testing Cadence ("Test When It Makes Sense")**:
 ### Simulation & Controls Harness Tooling
 - **Observable Tap Points**: Event hooks and ring buffers exposing internal states for developer and AI inspection.
 - **Mock Transports & Disturbance**: Synthetic STDIO/SSE harnesses (`mock_stdio.js`) with disconnect triggers, latency spikes, and malformed payload injection.
-- **Structured Feedback**: Standardized 6-part agent feedback envelope (`inputs`, `active_settings`, `action_history`, `output_delta`, `captured_logs`, `reproduction_command`).
+- **Structured Feedback**: Standardized 6-part agent feedback envelope (`inputs`, `assumptions`, `active_settings`, `action_history`, `output_delta`, `captured_logs`, with `reproduction_command`).
 - **E2E & Layout UX**: Playwright paired with `playwright-layout-inspector` to audit:
   - Zero horizontal overflow (`expect(page).toHaveNoLayoutOverflow()`)
   - Mobile viewport fit & zoom accessibility (`expect(page).toHaveMobileFit()`)

@@ -82,7 +82,7 @@ Run the installer script to symlink skills into your agent environments (Antigra
 ### 4. Living Documentation Site (VitePress)
 Host and browse project documentation, archetypes, and standards using VitePress:
 ```bash
-cd docs && npm install && npm run docs:dev
+npm install && npm run docs:dev
 ```
 Deployments automatically publish to GitHub Pages via the 4-stage CI/CD pipeline.
 

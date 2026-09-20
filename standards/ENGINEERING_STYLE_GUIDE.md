@@ -220,7 +220,7 @@ flowchart LR
         G3["Fullstack Smoke Run<br>Health probe loop & live handshake"]
     end
     subgraph S4["4. Analysis & Release"]
-        G4["CodeQL Security Analysis<br>Multi-platform Container Publish"]
+        G4["CodeQL Security Analysis<br>Native Container Publish (linux/amd64)"]
     end
 
     S1 --> S2

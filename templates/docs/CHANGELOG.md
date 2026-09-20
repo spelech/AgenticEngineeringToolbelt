@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.0.0] - 2026-08-23
 ### Added
 - Initial project scaffolding according to engineering archetype.
-- .NET 10 Minimal API with Dapper SQLite WAL persistence.
+- .NET 9 Minimal API with Dapper SQLite WAL persistence.
 - React 19 + TypeScript + Zustand 5 frontend.
 - Controls-grade xUnit, Vitest, and Playwright layout test suites.
 - 4-stage GitHub Actions CI quality gates.

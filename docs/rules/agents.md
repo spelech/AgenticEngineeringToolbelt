@@ -79,5 +79,5 @@ Mandatory architectural guidelines and execution rules for AI coding assistants.
    - **Tier 3 (Pre-PR / Pre-Release / CI Quality Gate)**: Full test matrix, multi-provider integration tests, simulation stress loops, and Playwright layout audits run before merging to `develop`/`main` and in CI.
 3. **Coverage Target**: Maintain $\ge$ 80% code coverage across unit, integration, and E2E suites.
 4. **UI Layout Inspection**: Frontends must pass the 4-point `playwright-layout-inspector` audit (no overflow, mobile fit, $\ge$ 24px targets, $\ge$ 85 score) with `data-testid` attributes.
-5. **6-Part Agent Feedback Envelope**: Format harness/test failures with `inputs`, `assumptions`, `active_settings`, `action_history`, `output_delta`, `captured_logs`, and `reproduction_command`.
+5. **6-Part Agent Feedback Envelope**: Format harness/test failures using the standardized diagnostic envelope: (1) `inputs`, (2) `assumptions`, (3) `active_settings`, (4) `action_history`, (5) `output_delta`, and (6) `captured_logs`, along with deterministic `reproduction_command` metadata.
 6. **Empirical Verification**: Never claim a task complete without running build, tests, verifying logs, and probing `/health`.
