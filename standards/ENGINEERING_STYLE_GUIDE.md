@@ -16,11 +16,36 @@ flowchart LR
 
 - **Vision & Exploration**: Steven drives the conceptual vision, architecture, and feature ideas. Because ideas start conceptually and evolve during design, **part of the agent's primary job is to ask insightful clarifying questions** to flesh out requirements, edge cases, and design constraints before or during development.
 - **Iterative Prototyping**: Build via rapid prototyping and closed-loop evaluation—prototyping early, running test harnesses, learning from live behavior, and refining architecture iteratively.
-- **Git Branch & PR Discipline**:
-  - All new features and significant plans start on a **fresh feature branch** off `develop` (or `main`/`master`).
-  - Use `develop` as the active integration branch for consolidating multiple feature tracks prior to a production release on `main`.
+- **Git Flow Branching & Release Discipline**:
+  - Adopt traditional Git Flow across all repositories:
+    - `main`: Production tagged releases only (`vX.Y.Z`). Every commit represents a verified release. Direct pushes are protected and forbidden.
+    - `develop`: Primary integration branch for ongoing work. Feature branches merge here through Pull Requests.
+    - `feature/*`: Dedicated branches created off `develop` (`feature/feature-name`). Contains isolated unit and functional work. Merges back to `develop` after Tier 2 and Tier 3 gates pass.
+    - `release/*`: Created off `develop` (`release/vX.Y.Z`) when features freeze for an upcoming release. Dedicated to version bumping, changelog finalization, and release verification. Merges into `main` (with release tag) and syncs back to `develop`.
+    - `hotfix/*`: Created directly off `main` (`hotfix/vX.Y.Z`) to address critical production defects. Merges into both `main` (with release tag) and `develop`.
   - Work is committed with **fine-grained, atomic Conventional Commits** (`feat:`, `fix:`, `test:`, `docs:`, `chore:`).
-  - Features culminate in a **Pull Request (PR)** where all 4-stage CI quality gates must pass before merging.
+  - Merges culminate in Pull Requests where all CI quality gates must pass before merging.
+
+```mermaid
+gitGraph
+    commit id: "v1.0.0"
+    branch develop
+    checkout develop
+    commit id: "dev-init"
+    branch feature/core-api
+    checkout feature/core-api
+    commit id: "feat: add api contract"
+    commit id: "feat: implement service"
+    checkout develop
+    merge feature/core-api id: "PR #1 merged"
+    branch release/v1.1.0
+    checkout release/v1.1.0
+    commit id: "chore(release): bump v1.1.0"
+    checkout main
+    merge release/v1.1.0 id: "tag: v1.1.0"
+    checkout develop
+    merge release/v1.1.0 id: "sync develop"
+```
 
 ---
 
@@ -55,6 +80,14 @@ flowchart LR
 1. **Never Leak Raw Stacks**: Prevent raw stack traces or internal database schemas from leaking to clients. Return clean error payloads with correlation IDs.
 2. **Domain Exceptions**: Use well-defined domain exceptions for unexpected system failures; use Result/boolean patterns for expected validation failures.
 3. **Reproducible Debug Payloads**: All error logs must capture the error description, stack trace, and the exact input payload/state that caused the failure to aid deterministic reproduction.
+
+### 2.6 APIs First, MCP Later Architectural Rule
+1. **Foundational Domain APIs**: Always implement domain business logic, data models, validation, error handling, and security inside typed, first-class APIs (e.g., ASP.NET Core Minimal APIs / Controllers, FastAPI endpoints, C++ native libraries, or CLI interfaces).
+2. **Secondary MCP Adapter**: Expose Model Context Protocol (MCP) tools strictly as thin, lightweight adapter layers that call into existing, hardened APIs or service interfaces.
+3. **Architectural Isolation**:
+   - Developers, integration suites, and test harnesses can exercise and verify APIs directly via standard HTTP, CLI, or in-memory calls without requiring an active LLM or MCP host runtime.
+   - Core domain logic is written, tested, and maintained in a single place rather than duplicated across agent wrappers.
+   - Preserves software independence and robustness against evolving AI protocol interfaces or tool schemas.
 
 ---
 
@@ -117,25 +150,50 @@ flowchart TD
 
 ---
 
-## 🧪 6. Testing, Harnesses & Simulation
+## 🧪 6. Simulation & Control Harnesses (For Developers & AI)
 
-- **Controls Mindset**: Software is a dynamic system. Build dedicated test harnesses whenever crossing an API/network boundary or implementing algorithms with tunable variability.
-- **High-Volume & Closed-Loop Testing**: Harnesses run high-volume throughput tests, parameter sweeps, and convergence checks.
-- **Disturbance Ingestion**: Inject malformed payloads and abrupt disconnects/terminations to test error fallbacks and graceful degradation.
-- **Agent Tap Points**: Agents inject internal diagnostic hooks during development (and clean them up before production) to expose internal state without relying solely on string logs.
-- **Agent Feedback Envelope**: On harness or test failure, provide a structured diagnostic payload:
-  1. **Inputs** & **Assumptions**
-  2. **Active Settings / Environment**
-  3. **History of Actions** (state transition trace)
-  4. **Actual Output vs Expected Output**
-  5. **Captured Execution Logs**
-  6. **Deterministic Reproduction Script / Command**
+- **Controls Mindset**: Software operates as an observable dynamic system requiring continuous state inspection, actuation, and closed-loop feedback. Build dedicated test harnesses whenever crossing an API/network boundary, managing stateful protocols, or implementing algorithms with tunable variability.
+- **Dynamic System Observation & Stress Capabilities**:
+  - **Diagnostic Tap Points**: Agents inject internal diagnostic hooks (in-memory ring buffers, state transition listeners, and frontend `data-testid` attributes) during development to expose internal state without relying on string log scraping. Clean up or compile-guard debug hooks before production release.
+  - **High-Volume Simulation Loops**: Harnesses execute high-volume throughput stress loops, synthetic batch feeds, parameter sweeps, and convergence tests to detect race conditions, memory leaks, and performance drift under load.
+  - **Disturbance Ingestion**: Inject malformed payloads (corrupt JSON, truncated strings), synthetic network latency, and abrupt disconnects (socket drops, process terminations) to verify error fallbacks, retry logic, and clean `CancellationToken` teardowns.
+  - **Standardized 6-Part Feedback Envelope**: When a test harness, integration test, or simulation loop fails, format the failure payload into a standardized diagnostic envelope:
+    1. **Inputs**: Raw parameters and seeds fed to the harness.
+    2. **Assumptions**: Environmental preconditions expected by the test.
+    3. **Active Settings**: Configurations, connection pools, timeouts, and database pragmas.
+    4. **Action History**: Exact sequence of state transitions leading up to the failure.
+    5. **Output Delta**: Expected output vs actual outcome delta.
+    6. **Captured Logs & Repro Command**: Ring-buffer error messages and deterministic CLI reproduction command.
+- **Tiered Testing Cadence ("Test When It Makes Sense")**:
+  - Avoid running heavy, slow, or brittle integration suites while feature interfaces and algorithms are actively mutating during rapid prototyping.
+  - **Tier 1 (Inner Loop / Rapid Development)**:
+    - Fast, isolated in-memory unit tests run on demand.
+    - Zero mandatory test runs during early exploratory prototyping and drafting.
+  - **Tier 2 (Stabilization Gate / Pre-Manual Verification)**:
+    - Run unit test suites and targeted integration tests once feature interfaces and domain boundaries stabilize, immediately prior to developer or agent manual testing.
+  - **Tier 3 (Pre-PR / Pre-Release / CI Quality Gate)**:
+    - Execute full test matrix, multi-provider integration tests, high-volume simulation harnesses, and Playwright layout audits before merging into `develop`/`main` and within CI pipelines.
 - **Coverage Target**: $\ge$ 80% code coverage across unit, integration, and E2E suites.
 
 ---
 
 ## 📑 7. Living Documentation & Automation
 
+### 7.1 ASD-STE100 & Mermaid Documentation Standards
+- **ASD-STE100 (Simplified Technical English)**:
+  - Enforce for all user-facing documentation, README files, architectural blueprints, and living specs.
+  - Keep sentences short and direct ($\le$ 20-25 words per sentence).
+  - Use active voice and imperative mood for instructions.
+  - Standardize vocabulary; avoid ambiguous jargon, colloquialisms, and redundant synonyms.
+  - Maintain one core instruction or requirement per sentence.
+- **Mermaid Visual Documentation**:
+  - Enforce native Mermaid syntax for architectural and flow diagrams (`flowchart TD`, `flowchart LR`, `sequenceDiagram autonumber`, `stateDiagram-v2`, `gitGraph`).
+  - Keep diagrams in version control alongside markdown content to prevent architectural drift.
+- **VitePress Living Documentation Engine**:
+  - Host project living documentation via VitePress deployed to GitHub Pages.
+  - Provide structured navigation across Architecture, Standards, API references, and Agent workflows.
+
+### 7.2 Repository Documentation Assets
 - **`ARCHITECTURE.md`**:
   - Top-down Mermaid topology flowchart (`flowchart TD`).
   - Step-numbered sequence diagrams (`sequenceDiagram autonumber`).
