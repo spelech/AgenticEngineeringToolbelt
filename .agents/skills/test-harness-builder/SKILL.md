@@ -1,11 +1,13 @@
 ---
 name: test-harness-builder
-description: Builds controls-grade test harnesses, high-volume simulation loops, agent diagnostic tap points, Playwright UI drivers, and standardized 6-part agent feedback envelopes.
+description: Builds controls-grade simulation and control harnesses, diagnostic tap points, disturbance injection suites, Playwright UI drivers, and 6-part feedback envelopes for developers and AI.
 ---
 
-# 🧪 Test Harness & Simulation Builder Skill (`test-harness-builder`)
+# 🧪 Simulation & Control Harness Builder for Developers and AI (`test-harness-builder`)
 
-Use this skill when introducing a new API boundary, algorithmic module, state machine, or frontend UI that requires rigorous closed-loop verification.
+Use this skill when introducing a new API boundary, algorithmic module, state machine, dynamic subsystem, or frontend UI that requires rigorous closed-loop verification and observability.
+
+This skill equips both **human engineers** and **AI agents** to treat software as an observable dynamic system with state introspection, stress simulation, and deterministic error reproduction.
 
 ---
 
@@ -13,37 +15,52 @@ Use this skill when introducing a new API boundary, algorithmic module, state ma
 
 ```mermaid
 flowchart TD
-    Identify["1. Identify Boundary or Algorithm<br>(Ask user what loop to build around)"] --> Design["2. Design Simulation Harness<br>(High-volume loop, synthetic inputs, disturbance injection)"]
-    Design --> Tap["3. Inject Diagnostic Tap Points<br>(Ring buffers, state transition hooks, test-ids)"]
-    Tap --> Envelope["4. Implement 6-Part Feedback Envelope<br>(Structured JSON on failure)"]
-    Envelope --> Verify["5. Run Closed-Loop Suite & Validate $\ge$ 80% Cov"]
+    Identify["1. Identify Boundary & Observability Needs<br>(Subsystem, state variables, tap points)"] --> Design["2. Design Simulation Harness<br>(Simulation loop, parameter sweeps, disturbance injection)"]
+    Design --> Tap["3. Inject Diagnostic Tap Points<br>(Ring buffers, state transition hooks, data-testid)"]
+    Tap --> Envelope["4. Implement 6-Part Feedback Envelope<br>(Structured JSON on failure for dev/AI analysis)"]
+    Envelope --> Cadence["5. Assign to Testing Tier<br>(Tier 2 Stabilization Gate or Tier 3 Pre-PR Gate)"]
+    Cadence --> Verify["6. Run Closed-Loop Suite & Validate $\ge$ 80% Cov"]
 ```
 
 ---
 
 ## 📋 Interactive Setup Protocol
 
-When invoked, the agent asks:
-1. **Target Component / Boundary**: *"What specific subsystem, API boundary, or algorithm do you want to build a loop around?"*
-2. **Stress & Volume Parameters**: *"What batch size / throughput target should we stress (e.g. 500 items, 50 concurrent streams)?"*
-3. **Disturbance Modes**: *"Do we need malformed payload ingestion, simulated abrupt disconnects, or cancellation stress?"*
+When invoked, the agent engages in proactive questioning to configure the harness:
+1. **Target Component / System Boundary**: *"What specific subsystem, dynamic system, API boundary, or algorithm do you want to observe and control?"*
+2. **Diagnostic Tap Points & Observability**: *"What internal state transitions, in-memory ring buffers, or UI `data-testid` anchors do developers and AI need to tap into?"*
+3. **Simulation Loop & Parameter Sweeps**: *"What throughput target, iteration volume, or parameter sweep space (e.g. 500 iterations, 50 concurrent streams) should the simulation run?"*
+4. **Disturbance Injection Modes**: *"What failure modes should we inject (e.g. abrupt socket disconnects, malformed payloads, latency spikes, cancellation storms)?"*
+5. **Testing Tier & Gate Cadence**: *"Is this harness intended as a Tier 2 stabilization gate before manual testing or a Tier 3 Pre-PR / Pre-Release CI gate?"*
 
 ---
 
 ## 🛠️ Artifacts Generated
 
-### 1. High-Volume Simulation Harness
-- **Backend / Services**: High-throughput execution loops measuring throughput, memory stability, and state convergence.
+### 1. High-Volume Simulation Harness & Parameter Sweeps
+- **Backend / Services**: High-throughput execution loops measuring throughput, memory stability, and state convergence across parameterized sweeps.
 - **Transports**: Synthetic child process STDIO (`mock_stdio.js`) or stream injectors.
 
-### 2. Frontend Playwright Driver
-- Injects `data-testid` attributes on interactive components.
-- Generates `tests/e2e/layout-audit.spec.ts` running the 4-point `playwright-layout-inspector` suite.
+### 2. Disturbance Injection Suite
+- Configurable synthetic disturbance triggers:
+  - Abrupt process / socket disconnects and reconnection recovery.
+  - Malformed or partial payload injection.
+  - Injected latency spikes and timeout stress.
+  - Clean `CancellationToken` teardown verification.
 
 ### 3. Diagnostic Tap Points
-- Injects temporary event-driven diagnostic hooks or ring-buffer state getters to observe internal state transitions during test execution.
+- **In-Memory Ring Buffers**: Temporary or toggleable ring-buffer state getters (`DiagnosticTapRingBuffer`) capturing internal state transitions without polluting production logs.
+- **Introspection Endpoints**: Debug tap points enabling developer and AI agent inspection during active execution.
 
-### 4. 6-Part Agent Feedback Envelope
+### 4. Frontend Playwright Driver & Layout Audit
+- Injects standard `data-testid` attributes on interactive components.
+- Generates `tests/e2e/layout-audit.spec.ts` running the 4-point `playwright-layout-inspector` suite:
+  - Zero horizontal overflow
+  - Mobile viewport fit
+  - Touch target ergonomics ($\ge 24$px)
+  - Composite UX audit score ($\ge 85$)
+
+### 5. Standardized 6-Part Feedback Envelope
 Generates failure formatting containing:
 - `inputs` & `assumptions`
 - `active_settings`
