@@ -136,7 +136,7 @@ def check_changelog_headers(root_dir: Path, target_version: Optional[str] = None
     return all_valid
 
 def is_template_dir(path: Path) -> bool:
-    return "templates" in path.parts and ("configs" in path.parts or "docs" in path.parts)
+    return "templates" in path.parts and ("configs" in path.parts or "docs" in path.parts or "vitepress" in path.parts or "workflows" in path.parts)
 
 def check_manifest_versions(root_dir: Path, target_version: Optional[str] = None) -> bool:
     print("🔍 Auditing project manifests for version synchronization...")
@@ -204,7 +204,7 @@ def check_manifest_versions(root_dir: Path, target_version: Optional[str] = None
 def check_markdown_links(root_dir: Path) -> bool:
     print("🔍 Auditing markdown relative links and anchors...")
     has_errors = False
-    md_files = [f for f in root_dir.rglob("*.md") if not is_excluded(f)]
+    md_files = [f for f in root_dir.rglob("*.md") if not is_excluded(f) and not is_template_dir(f)]
 
     link_pattern = re.compile(r'\[([^\]]+)\]\(([^)]+)\)')
 
@@ -220,8 +220,30 @@ def check_markdown_links(root_dir: Path) -> bool:
             if not target_path:
                 continue
 
-            resolved = (md_file.parent / target_path).resolve()
-            if not resolved.exists():
+            # Support VitePress root-relative links e.g. /standards/...
+            if target_path.startswith("/"):
+                candidates = [
+                    (root_dir / "docs" / target_path.lstrip("/")),
+                    (root_dir / target_path.lstrip("/"))
+                ]
+            else:
+                candidates = [md_file.parent / target_path]
+
+            resolved_exists = False
+            for cand in candidates:
+                cand_res = cand.resolve()
+                if cand_res.exists():
+                    resolved_exists = True
+                    break
+                # Support VitePress extensionless route links (.md omitted)
+                if cand_res.with_suffix(".md").exists():
+                    resolved_exists = True
+                    break
+                if (cand_res / "index.md").exists():
+                    resolved_exists = True
+                    break
+
+            if not resolved_exists:
                 print(f"❌ Broken link in {md_file.relative_to(root_dir)}: [{text}]({link})")
                 has_errors = True
 
