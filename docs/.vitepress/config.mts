@@ -29,7 +29,7 @@ export default withMermaid(
           items: [
             { text: 'Catalog Overview', link: '/archetypes/' },
             { text: '.NET Console & CLI', link: '/archetypes/console-cli-dotnet' },
-            { text: 'Controls Fullstack (.NET + React)', link: '/archetypes/controls-fullstack-dotnet-react' },
+            { text: 'Fullstack (.NET + React)', link: '/archetypes/fullstack-dotnet-react' },
             { text: 'C++ Native Algorithms', link: '/archetypes/native-cpp-algorithms' },
             { text: 'Python FastAPI & MCP', link: '/archetypes/python-fastapi-mcp' },
             { text: 'React TS Vite UI', link: '/archetypes/react-ts-vite-ui' }

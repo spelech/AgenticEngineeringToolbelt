@@ -54,14 +54,14 @@
 ### Task 2: Archetypes & Skills Updates (`archetypes/`, `.agents/skills/`)
 
 **Files:**
-- Modify: `archetypes/controls-fullstack-dotnet-react.md`
+- Modify: `archetypes/fullstack-dotnet-react.md`
 - Modify: `archetypes/README.md`
 - Modify: `archetypes/python-fastapi-mcp.md`
 - Modify: `.agents/skills/test-harness-builder/SKILL.md`
 - Modify: `.agents/skills/engineering-archetype/SKILL.md`
 - Modify: `.agents/skills/scaffold-project/SKILL.md`
 
-- [x] **Step 1: Reframe `archetypes/controls-fullstack-dotnet-react.md`**
+- [x] **Step 1: Reframe `archetypes/fullstack-dotnet-react.md`**
   - Update title to "🏛️ Archetype: Fullstack (.NET + React + SQL) with Simulation & Control Harness".
   - Reframe harness descriptions to highlight developer & AI observation, tap points, and closed-loop feedback.
 - [x] **Step 2: Update `archetypes/python-fastapi-mcp.md` and `archetypes/README.md`**

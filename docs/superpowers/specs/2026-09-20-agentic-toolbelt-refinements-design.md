@@ -142,7 +142,7 @@ gitGraph
 | **Standards** | `standards/ENGINEERING_STYLE_GUIDE.md` | Add "APIs First, MCP Later", ASD-STE100 documentation standard, Tiered Testing Cadence, and reframed Simulation & Control Harnesses. |
 | **Standards** | `standards/TESTING_HARNESS_PATTERNS.md` | Reframe "controls-grade" to Simulation & Control Harnesses for developers and AI; detail tap points, sweeps, and feedback envelopes. |
 | **Standards** | `standards/CI_CD_PIPELINES.md` | Update pipeline triggers and topology for Git Flow (`main`, `develop`, `release/*`). |
-| **Archetypes** | `archetypes/controls-fullstack-dotnet-react.md` | Rename/reframe to Fullstack (.NET + React + SQL) with Simulation & Control Harness. |
+| **Archetypes** | `archetypes/fullstack-dotnet-react.md` | Fullstack (.NET + React + SQL) with Simulation & Control Harness. |
 | **Archetypes** | `archetypes/README.md` & others | Update references to Git Flow, APIs First, and Simulation & Control Harnesses. |
 | **Rules** | `rules/AGENTS.md`, `rules/CLAUDE.md`, `rules/GEMINI.md` | Update branching to full Git Flow, codify Tiered Testing, and add ASD-STE100 writing rule. |
 | **Skills** | `.agents/skills/test-harness-builder/SKILL.md` | Reframe to Simulation & Control Harness Builder for developers and AI. |

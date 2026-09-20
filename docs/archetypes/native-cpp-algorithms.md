@@ -74,7 +74,7 @@ extern "C" {
 ```
 
 ```csharp
-// C# .NET 9 Consumption via [LibraryImport]
+// C# .NET 10 Consumption via [LibraryImport]
 using System.Runtime.InteropServices;
 
 public static partial class NativeInterop

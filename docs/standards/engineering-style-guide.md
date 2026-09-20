@@ -101,7 +101,7 @@ gitGraph
 ```mermaid
 flowchart TD
     Task["Select Project Archetype"]
-    Task -->|High-Performance Systems / Protocols / Control Planes| CSharp["C# (.NET 9)<br>• System.CommandLine + DI<br>• Dapper + Stored Procs (SQL files)<br>• SQLite WAL (MySQL-like) / MSSQL<br>• Native WPF/WinForms/Avalonia (No Electron)"]
+    Task -->|High-Performance Systems / Protocols / Control Planes| CSharp["C# (.NET 10)<br>• System.CommandLine + DI<br>• Dapper + Stored Procs (SQL files)<br>• SQLite WAL (MySQL-like) / MSSQL<br>• Native WPF/WinForms/Avalonia (No Electron)"]
     Task -->|Scrapers / ML / Vision / Data Pipelines / Automation| Python["Python (3.12+)<br>• uv package management<br>• Typer + Pydantic models<br>• FastAPI + FastMCP<br>• asyncio runtime"]
     Task -->|Web UIs / Layout Analyzers / Interactive Apps| TypeScript["TypeScript / React<br>• Strict TS + Vite<br>• Zustand stores per domain/controller<br>• Pure CSS Modules & CSS variables<br>• Playwright Layout Inspector 4-point audit"]
     Task -->|Algorithms / Native Systems / High-Compute| Cpp["C++ (C++20/23)<br>• MSBuild (Win) / CMake (Linux)<br>• vcpkg manifest mode<br>• Strict RAII & std::smart_pointers<br>• GoogleTest + ASan/UBSan + Benchmark<br>• C# [LibraryImport] & Python pybind11 interop"]
@@ -111,7 +111,7 @@ flowchart TD
 
 ## 🏛️ 4. Backend Architecture & Persistence
 
-### 4.1 C# .NET 9
+### 4.1 C# .NET 10
 - **Project Structure**: Modern `.slnx` solution format with `<Nullable>enable</Nullable>`, `<ImplicitUsings>enable</ImplicitUsings>`, and `Directory.Build.props`.
 - **API Routing Division**:
   - **Minimal APIs**: Reserved for small projects, simple feed-through endpoints, lightweight vertical slices, and streaming routes.

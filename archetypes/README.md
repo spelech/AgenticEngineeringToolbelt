@@ -8,8 +8,8 @@ This directory contains battle-tested, standardized engineering archetypes that 
 
 | Archetype | Primary Stack | Key Highlights | Link |
 | :--- | :--- | :--- | :--- |
-| **Fullstack Simulation & Control** | C# .NET 9 + React + SQL | Dapper, Stored Procs (SQL files), SQLite WAL / MSSQL, Zustand, Simulation & Control Harness, Playwright Layout Inspector, Git Flow, 4-Stage CI/CD. | [**View Archetype**](controls-fullstack-dotnet-react.md) |
-| **C# Console & CLI** | C# .NET 9 | `System.CommandLine`, full DI, Native AOT ready, `--json` stream, `-v` debug dumps, `--dry-run`. | [**View Archetype**](console-cli-dotnet.md) |
+| **Fullstack Simulation & Control** | C# .NET 10 + React + SQL | Dapper, Stored Procs (SQL files), SQLite WAL / MSSQL, Zustand, Simulation & Control Harness, Playwright Layout Inspector, Git Flow, 4-Stage CI/CD. | [**View Archetype**](fullstack-dotnet-react.md) |
+| **C# Console & CLI** | C# .NET 10 | `System.CommandLine`, full DI, Native AOT ready, `--json` stream, `-v` debug dumps, `--dry-run`. | [**View Archetype**](console-cli-dotnet.md) |
 | **Python FastAPI & MCP** | Python 3.12+ | **APIs First, MCP Later**: `uv`, typed FastAPI REST endpoints first, thin FastMCP tool wrappers second, Pydantic v2 schemas, `aiosqlite`, `pytest`. | [**View Archetype**](python-fastapi-mcp.md) |
 | **React + TS + Vite UI** | React / TypeScript / Vite | Zustand domain stores, pure CSS Modules + custom properties, zero heavy UI bloat, 4-point layout audit. | [**View Archetype**](react-ts-vite-ui.md) |
 | **Modern C++ Native** | C++20/23 | MSBuild / CMake, `vcpkg`, strict RAII, GoogleTest, ASan/UBSan, Benchmark, C# / Python interop. | [**View Archetype**](native-cpp-algorithms.md) |

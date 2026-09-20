@@ -8,7 +8,7 @@
 
 | Layer | Technology | Rationale / Convention |
 | :--- | :--- | :--- |
-| **Runtime & Language** | .NET 9 / C# 13 | `<Nullable>enable</Nullable>`, `<ImplicitUsings>enable</ImplicitUsings>`, `.slnx` format. |
+| **Runtime & Language** | .NET 10 / C# 13 | `<Nullable>enable</Nullable>`, `<ImplicitUsings>enable</ImplicitUsings>`, `.slnx` format. |
 | **CLI Framework** | `System.CommandLine` or `CommandLineParser` | Robust argument parsing, verb/subcommand dispatching, type validation. |
 | **Dependency Injection** | `Microsoft.Extensions.Hosting` | Full `IHost` / `HostApplicationBuilder`, `Microsoft.Extensions.DependencyInjection`. |
 | **Logging & Output** | `ILogger` + `--json` Output Stream | Human-friendly console logs + structured JSON mode for agent consumption. |

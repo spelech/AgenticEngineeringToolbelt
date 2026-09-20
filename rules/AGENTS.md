@@ -56,7 +56,7 @@ Mandatory architectural guidelines and execution rules for AI coding assistants.
 
 ## 💻 3. Polyglot Language Matrix
 
-- **C# (.NET 9)**: `.slnx`, `System.CommandLine`, full DI, Dapper + Stored Procs (separate `.sql` files), SQLite WAL (MySQL-compatible) / MSSQL, native C# UIs (WPF/WinForms/Avalonia, no Electron), full `CancellationToken` propagation.
+- **C# (.NET 10)**: `.slnx`, `System.CommandLine`, full DI, Dapper + Stored Procs (separate `.sql` files), SQLite WAL (MySQL-compatible) / MSSQL, native C# UIs (WPF/WinForms/Avalonia, no Electron), full `CancellationToken` propagation.
 - **Python (3.12+)**: `uv`, `pyproject.toml`, FastAPI + FastMCP, Pydantic v2 schemas, `asyncio`, `pytest` ($\ge$ 80% coverage), `ruff`.
 - **TypeScript / React**: React + TS strict + Vite, Zustand domain stores, pure CSS Modules + custom properties, bespoke components, `playwright-layout-inspector` 4-point audit.
 - **C++ (C++20/23)**: MSBuild (Win) / CMake (Linux), `vcpkg`, strict RAII, smart pointers, GoogleTest (`gtest`), ASan/UBSan, Benchmark, C# `[LibraryImport]` / Python `pybind11` interop.

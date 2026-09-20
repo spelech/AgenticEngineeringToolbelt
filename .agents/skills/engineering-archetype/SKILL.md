@@ -62,7 +62,7 @@ This skill equips agents to collaborate effectively with Steven T. Pelech across
 
 | Language | Primary Domains | Core Conventions & Libraries |
 | :--- | :--- | :--- |
-| **C# (.NET 9)** | High-perf systems, control planes, protocols, daemons, native UIs | `System.CommandLine`, full DI, `.slnx`, Dapper + Stored Proc `.sql` files, SQLite WAL (MySQL-like) / MSSQL, Native WPF/WinForms/Avalonia (no Electron), `ConcurrentDictionary`, `Channel<T>`, `SemaphoreSlim`, `Interlocked`, `CancellationToken` throughout. |
+| **C# (.NET 10)** | High-perf systems, control planes, protocols, daemons, native UIs | `System.CommandLine`, full DI, `.slnx`, Dapper + Stored Proc `.sql` files, SQLite WAL (MySQL-like) / MSSQL, Native WPF/WinForms/Avalonia (no Electron), `ConcurrentDictionary`, `Channel<T>`, `SemaphoreSlim`, `Interlocked`, `CancellationToken` throughout. |
 | **Python (3.12+)** | Scrapers, data pipelines, vision, ML, automation | **APIs First, MCP Later**: `uv`, `pyproject.toml`, FastAPI endpoints first, FastMCP tool wrappers second, Pydantic v2 schemas, `asyncio`, `pytest` ($\ge$ 80% coverage), `ruff`. |
 | **TypeScript / React** | Web UIs, interactive dashboards, browser tools | React + TS strict + Vite, Zustand domain stores, pure CSS Modules + custom properties, bespoke components, `playwright-layout-inspector` 4-point audit. |
 | **C++ (C++20/23)** | Algorithms, geometry, native compute, low-level protocol engines | MSBuild (Win) / CMake (Linux), `vcpkg`, strict RAII, smart pointers, GoogleTest (`gtest`), ASan/UBSan, Google Benchmark, C# `[LibraryImport]` / Python `pybind11` interop. |

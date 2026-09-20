@@ -14,7 +14,7 @@ flowchart TD
     end
 
     subgraph API["API & Middleware Layer"]
-        MinimalAPI["ASP.NET Core Minimal APIs (.NET 9)"]
+        MinimalAPI["ASP.NET Core Minimal APIs (.NET 10)"]
         AuthMiddleware["Authentication & Validation Middleware"]
     end
 
@@ -49,7 +49,7 @@ sequenceDiagram
     autonumber
     actor User as Client / User
     participant Frontend as React SPA (Zustand)
-    participant API as Minimal API (.NET 9)
+    participant API as Minimal API (.NET 10)
     participant Repo as Dapper Repository
     participant DB as SQLite WAL Database
 

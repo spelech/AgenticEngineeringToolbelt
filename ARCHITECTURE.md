@@ -36,8 +36,8 @@ flowchart TD
 
 ### 1. `archetypes/`
 Curated polyglot engineering profiles codifying complete tech stacks, dependencies, and patterns:
-- `controls-fullstack-dotnet-react.md`: C# .NET 9 Minimal APIs/Controllers, Dapper + Stored Procs, SQLite WAL / MSSQL, React 19 + TypeScript + Zustand UI.
-- `console-cli-dotnet.md`: C# .NET 9 Console & CLI utilities via `System.CommandLine` and Microsoft DI.
+- `fullstack-dotnet-react.md`: C# .NET 10 Minimal APIs/Controllers, Dapper + Stored Procs, SQLite WAL / MSSQL, React 19 + TypeScript + Zustand UI.
+- `console-cli-dotnet.md`: C# .NET 10 Console & CLI utilities via `System.CommandLine` and Microsoft DI.
 - `python-fastapi-mcp.md`: Python 3.12+ services, FastMCP tool servers, Pydantic v2 validation, and async I/O.
 - `react-ts-vite-ui.md`: Standalone React 19 + TypeScript + Vite frontends, CSS Modules, and Playwright layout audits.
 - `native-cpp-algorithms.md`: High-performance C++20/23 libraries, CMake/MSBuild, `vcpkg`, and C#/Python interop.

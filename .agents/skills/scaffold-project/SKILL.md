@@ -11,8 +11,8 @@ Use this skill when initializing a new repository or service stack.
 
 ## 📋 Available Archetypes
 
-1. **`dotnet-fullstack`**: Fullstack (.NET + React + SQL) with Simulation & Control Harness (C# .NET 9, Dapper, Stored Procs, SQLite WAL, Zustand, Simulation Harness, Playwright Layout Inspector, Git Flow, 4-stage CI/CD).
-2. **`dotnet-cli`**: C# .NET 9 Console Utility (`System.CommandLine`, full DI, Native AOT ready, `--json` stream, `-v` debug dumps, `--dry-run`).
+1. **`dotnet-fullstack`**: Fullstack (.NET + React + SQL) with Simulation & Control Harness (C# .NET 10, Dapper, Stored Procs, SQLite WAL, Zustand, Simulation Harness, Playwright Layout Inspector, Git Flow, 4-stage CI/CD).
+2. **`dotnet-cli`**: C# .NET 10 Console Utility (`System.CommandLine`, full DI, Native AOT ready, `--json` stream, `-v` debug dumps, `--dry-run`).
 3. **`python-fastapi-mcp`**: Python 3.12+ Service (**APIs First, MCP Later**: `uv`, typed FastAPI endpoints first, thin FastMCP tool wrappers second, Pydantic v2, SQLite `aiosqlite`, `pytest`).
 4. **`react-ts-ui`**: Standalone Frontend (React + TS strict + Vite, Zustand stores, pure CSS Modules, `playwright-layout-inspector`).
 5. **`cpp-algorithms`**: Native Systems Library (C++20/23, MSBuild/CMake, `vcpkg`, GoogleTest, ASan, Benchmark, C#/Python interop).
@@ -24,7 +24,7 @@ Use this skill when initializing a new repository or service stack.
 ### 1. Autonomous Defaults Mode (`--defaults`)
 When `--defaults` is passed, the agent immediately generates the project using recommended defaults:
 - Traditional Git Flow branching (`main`, `develop`).
-- C# / .NET 9 / Modern `.slnx` solution format.
+- C# / .NET 10 / Modern `.slnx` solution format.
 - SQLite WAL configured with MySQL-compatible types.
 - Forward Auth + Bearer tokens for machine auth.
 - VitePress living documentation site in `docs/` targeting GitHub Pages.
