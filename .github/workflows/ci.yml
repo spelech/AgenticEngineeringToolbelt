@@ -57,3 +57,6 @@ jobs:
 
       - name: Verify Git Flow Helper Scripts
         run: bash templates/scripts/git-flow-release.sh help
+
+      - name: Audit Test Theatre & Mock Dominance
+        run: python3 templates/scripts/verify_release.py --audit-tests
