@@ -1,0 +1,117 @@
+/**
+ * University of Illinois (UIUC) Theme for VitePress
+ * Official Colors:
+ * - Illinois Blue: #13294B
+ * - Illinois Orange: #FF5F05
+ * - Altgeld / Alma Navy: #0B162A
+ */
+
+:root {
+  /* Brand colors: Illinois Orange */
+  --vp-c-brand-1: #FF5F05;
+  --vp-c-brand-2: #E84A27;
+  --vp-c-brand-3: #C83B18;
+  --vp-c-brand-soft: rgba(255, 95, 5, 0.14);
+
+  /* Secondary accents: Illinois Blue */
+  --vp-c-navy-1: #13294B;
+  --vp-c-navy-2: #1E3D6B;
+  --vp-c-navy-3: #2B5797;
+
+  /* Hero gradient */
+  --vp-home-hero-name-color: transparent;
+  --vp-home-hero-name-background: -webkit-linear-gradient(120deg, #13294B 35%, #FF5F05);
+
+  /* Custom badge colors */
+  --vp-badge-tip-border: #FF5F05;
+  --vp-badge-tip-text: #13294B;
+  --vp-badge-tip-bg: rgba(255, 95, 5, 0.12);
+
+  /* Button brand */
+  --vp-button-brand-border: #FF5F05;
+  --vp-button-brand-text: #FFFFFF;
+  --vp-button-brand-bg: #FF5F05;
+  --vp-button-brand-hover-border: #E84A27;
+  --vp-button-brand-hover-text: #FFFFFF;
+  --vp-button-brand-hover-bg: #E84A27;
+  --vp-button-brand-active-border: #C83B18;
+  --vp-button-brand-active-text: #FFFFFF;
+  --vp-button-brand-active-bg: #C83B18;
+
+  /* Button alt (Illinois Blue in light mode) */
+  --vp-button-alt-border: #13294B;
+  --vp-button-alt-text: #13294B;
+  --vp-button-alt-bg: transparent;
+  --vp-button-alt-hover-border: #1E3D6B;
+  --vp-button-alt-hover-text: #FFFFFF;
+  --vp-button-alt-hover-bg: #13294B;
+}
+
+.dark {
+  /* Brand colors: Vibrant Illinois Orange for dark backgrounds */
+  --vp-c-brand-1: #FF5F05;
+  --vp-c-brand-2: #FF7528;
+  --vp-c-brand-3: #FF8D4A;
+  --vp-c-brand-soft: rgba(255, 95, 5, 0.22);
+
+  /* Deep Illinois Blue background hierarchy */
+  --vp-c-bg: #0B162A;
+  --vp-c-bg-alt: #07101E;
+  --vp-c-bg-elv: #13243F;
+  --vp-c-bg-soft: #13294B;
+
+  /* Border tones with subtle blue tint */
+  --vp-c-border: #1E3557;
+  --vp-c-divider: #182C49;
+  --vp-c-gutter: #0B162A;
+
+  /* Hero gradient in dark mode */
+  --vp-home-hero-name-color: transparent;
+  --vp-home-hero-name-background: -webkit-linear-gradient(120deg, #FF7528 25%, #7BA4D8);
+
+  /* Custom badge colors */
+  --vp-badge-tip-border: #FF7528;
+  --vp-badge-tip-text: #FFA066;
+  --vp-badge-tip-bg: rgba(255, 95, 5, 0.18);
+
+  /* Button brand */
+  --vp-button-brand-border: #FF5F05;
+  --vp-button-brand-text: #FFFFFF;
+  --vp-button-brand-bg: #FF5F05;
+  --vp-button-brand-hover-border: #FF7528;
+  --vp-button-brand-hover-text: #FFFFFF;
+  --vp-button-brand-hover-bg: #FF7528;
+  --vp-button-brand-active-border: #FF8D4A;
+  --vp-button-brand-active-text: #FFFFFF;
+  --vp-button-brand-active-bg: #FF8D4A;
+
+  /* Button alt in dark mode */
+  --vp-button-alt-border: #1E3D6B;
+  --vp-button-alt-text: #E2E8F0;
+  --vp-button-alt-bg: #13243F;
+  --vp-button-alt-hover-border: #FF5F05;
+  --vp-button-alt-hover-text: #FFFFFF;
+  --vp-button-alt-hover-bg: #1E3557;
+}
+
+/* Custom styling for nav and active items */
+.VPNavBarMenuLink.active,
+.VPNavBarMenuLink:hover {
+  color: var(--vp-c-brand-1) !important;
+}
+
+/* Active sidebar item */
+.VPSidebarItem.is-active > .item .text {
+  color: var(--vp-c-brand-1) !important;
+  font-weight: 600;
+}
+
+/* Feature card subtle hover highlight */
+.VPFeature:hover {
+  border-color: var(--vp-c-brand-1) !important;
+}
+
+/* Code block header accent */
+div[class*='language-']::before {
+  color: var(--vp-c-brand-1);
+}
