@@ -73,7 +73,8 @@ flowchart LR
 Testing adheres to the **Tiered Testing Cadence ("Test When It Makes Sense")**:
 
 1. **Tier 1 (Inner Loop / Rapid Development)**:
-   - High-speed unit tests (xUnit + NSubstitute in C#; Vitest + `@testing-library/react` + `happy-dom` in TS).
+   - High-speed unit tests (xUnit in C#; Vitest + `@testing-library/react` + `happy-dom` in TS).
+   - Real implementations over synthetic mocks; restrict NSubstitute strictly to external 3rd-party boundaries.
    - Executed on-demand during active coding for immediate feedback.
 2. **Tier 2 (Stabilization Gate / Pre-Manual Verification)**:
    - Simulation & control harnesses, diagnostic tap points, and Playwright layout audits.
@@ -81,6 +82,41 @@ Testing adheres to the **Tiered Testing Cadence ("Test When It Makes Sense")**:
 3. **Tier 3 (Pre-PR / Pre-Release / CI Quality Gate)**:
    - Pairwise multi-provider database matrices, live background process smoke tests, and full 4-stage CI gate.
    - Executed prior to PR merge and during release stabilization.
+
+### Representative Test Harness: Web API Integration
+
+Always execute full HTTP roundtrips against a running test host. Use `WebApplicationFactory<Program>` with an in-memory SQLite database configured in WAL mode. Execute real database migrations and real Dapper queries. Never mock internal domain services, database contexts, or repository interfaces. Restrict test doubles strictly to external third-party network boundaries.
+
+```csharp
+public class ApiIntegrationTestBase : WebApplicationFactory<Program>
+{
+    private SqliteConnection _keepAliveConnection;
+
+    protected override void ConfigureWebHost(IWebHostBuilder builder)
+    {
+        builder.ConfigureServices(services =>
+        {
+            var descriptor = services.SingleOrDefault(d => d.ServiceType == typeof(IDbConnectionFactory));
+            if (descriptor != null) services.Remove(descriptor);
+
+            _keepAliveConnection = new SqliteConnection("Data Source=:memory:;Mode=Memory;Cache=Shared");
+            _keepAliveConnection.Open();
+
+            services.AddSingleton<IDbConnectionFactory>(new SqliteConnectionFactory(_keepAliveConnection));
+
+            var sp = services.BuildServiceProvider();
+            var migrator = sp.GetRequiredService<IDatabaseMigrator>();
+            migrator.MigrateUp();
+        });
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        _keepAliveConnection?.Dispose();
+        base.Dispose(disposing);
+    }
+}
+```
 
 ### Simulation & Controls Harness Tooling
 - **Observable Tap Points**: Event hooks and ring buffers exposing internal states for developer and AI inspection.
