@@ -84,3 +84,39 @@ public static partial class NativeInterop
     );
 }
 ```
+
+---
+
+## 🧪 Representative Test Harness: Parameter Sweeps & Boundary Stress
+
+Test numerical algorithms and solvers using parameterized GoogleTest suites (`TEST_P`). Sweep parameter spaces across boundary values (`-1e5`, `-1.0`, `0.0`, `1.0`, `1e5`) and disturbance combinations. Do not mock mathematical algorithms, numerical convergence routines, or hardware state machines. Always execute test suites under AddressSanitizer (ASan) and UndefinedBehaviorSanitizer (UBSan). Assert mathematical convergence, residual error tolerances, and iteration budgets.
+
+```cpp
+#include <gtest/gtest.h>
+#include "numerical_solver.hpp"
+
+class SolverBoundaryTest : public ::testing::TestWithParam<std::tuple<double, double, int>> {};
+
+TEST_P(SolverBoundaryTest, ConvergesWithinToleranceUnderDisturbance) {
+    auto [initial_value, learning_rate, max_iterations] = GetParam();
+    
+    SolverConfig config{.lr = learning_rate, .max_iter = max_iterations};
+    NumericalSolver solver(config);
+
+    auto result = solver.Solve(initial_value);
+
+    EXPECT_TRUE(result.converged);
+    EXPECT_LT(std::abs(result.residual), 1e-6);
+    EXPECT_LE(result.iterations_taken, max_iterations);
+}
+
+INSTANTIATE_TEST_SUITE_P(
+    BoundarySweeps,
+    SolverBoundaryTest,
+    ::testing::Combine(
+        ::testing::Values(-1e5, -1.0, 0.0, 1.0, 1e5),
+        ::testing::Values(0.001, 0.01, 0.1),
+        ::testing::Values(10, 100, 1000)
+    )
+);
+```

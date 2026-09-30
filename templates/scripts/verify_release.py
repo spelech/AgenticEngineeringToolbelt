@@ -12,7 +12,7 @@ import re
 import subprocess
 import sys
 from pathlib import Path
-from typing import List, Optional, Tuple
+from typing import List, Optional, Set, Tuple
 
 # Ensure UTF-8 output encoding across Windows and POSIX environments
 if sys.platform == "win32":
@@ -251,12 +251,271 @@ def check_markdown_links(root_dir: Path) -> bool:
         print("✅ All markdown links verified successfully.")
     return not has_errors
 
+# ==============================================================================
+# Static Test Theatre Audit Engine
+# ==============================================================================
+
+TEST_FILE_EXTENSIONS: Set[str] = {".cs", ".py", ".ts", ".tsx", ".cpp", ".cc", ".cxx"}
+
+# Patterns identifying mock setup or verification invocations
+MOCK_CALL_PATTERNS = [
+    # Python
+    re.compile(r"\bassert_(?:called_once_with|called_once|called_with|called|any_call|has_calls|not_called)\s*\("),
+    re.compile(r"(?:mock|mocker)\.patch(?:|\.object)\s*\("),
+    re.compile(r"@(?:mock\.)?patch(?:\.object)?\s*\("),
+    # C#
+    re.compile(r"\.\s*Verify(?:All|NoOtherCalls)?\s*(?:<[^>]+>)?\s*\("),
+    re.compile(r"\.\s*(?:Received|DidNotReceive)\s*(?:<[^>]+>)?\s*\("),
+    re.compile(r"\bA\.CallTo\s*\("),
+    # TypeScript / Jest / Vitest
+    re.compile(r"\.\s*toHaveBeenCalled(?:With|Times)?\s*\("),
+    re.compile(r"\.\s*toHaveBeen(?:LastCalledWith|NthCalledWith)\s*\("),
+    re.compile(r"(?:jest|vi)\.spyOn\s*\("),
+    # C++
+    re.compile(r"\bEXPECT_CALL\s*\("),
+    re.compile(r"\bON_CALL\s*\("),
+]
+
+# Patterns identifying concrete state assertions
+STATE_ASSERTION_PATTERNS = [
+    # Python
+    re.compile(r"\bassert\s+(?!_called|any_call|has_calls|not_called)"),
+    re.compile(r"self\.assert(?:Equal|NotEqual|True|False|In|NotIn|Is|IsNot|IsNone|IsNotNone|AlmostEqual|Greater|GreaterEqual|Less|LessEqual|Regex|Raises|CountEqual)\s*\("),
+    re.compile(r"pytest\.raises\s*\("),
+    # C#
+    re.compile(r"\bAssert\.(?:Equal|NotEqual|True|False|Contains|DoesNotContain|Empty|NotEmpty|Null|NotNull|Same|NotSame|InRange|NotInRange|Throws|ThrowsAsync|Equivalent|Multiple)\s*(?:<[^>]+>)?\s*\("),
+    re.compile(r"\.\s*Should\s*\(\s*\)\s*\.\s*(?:Be|NotBe|Match|Contain|HaveCount|Throw|BeTrue|BeFalse|BeNull|NotBeNull|BeEquivalentTo)\b"),
+    # TypeScript / Jest / Vitest
+    re.compile(r"\bexpect\s*\(.*?\)\s*\.\s*(?:toBe|toEqual|toStrictEqual|toMatch|toContain|toHaveLength|toBeNull|toBeDefined|toBeUndefined|toBeTruthy|toBeFalsy|toBeGreaterThan|toBeLessThan|toBeGreaterThanOrEqual|toBeLessThanOrEqual|toThrow|toThrowError|toBeVisible|toHaveText|toHaveValue|toHaveAttribute|toHaveCount|toHaveNoLayoutOverflow|toHaveMobileFit|toHaveTouchFriendlyTargets|toPassLayoutAudit)\s*\("),
+    # C++
+    re.compile(r"\b(?:EXPECT|ASSERT)_(?:EQ|NE|TRUE|FALSE|LT|GT|LE|GE|STREQ|STRNE|NEAR|FLOAT_EQ|DOUBLE_EQ|THROW|NO_THROW)\s*\("),
+    re.compile(r"\b(?:REQUIRE|CHECK)(?:_FALSE)?\s*\("),
+]
+
+# Patterns identifying mock framework usage in a repository
+MOCK_FRAMEWORK_PATTERNS = [
+    ("Python unittest.mock/pytest-mock", re.compile(r"\b(?:unittest\.mock|pytest_mock|mocker|MagicMock|mock\.patch)\b|from\s+unittest\.mock|@patch")),
+    ("C# Moq/NSubstitute/FakeItEasy", re.compile(r"using\s+(?:Moq|NSubstitute|FakeItEasy)\b|\bMock<[A-Za-z0-9_]+>|new\s+Mock<")),
+    ("TypeScript Jest/Vitest Mocks", re.compile(r"(?:jest|vi)\.mock\s*\(|(?:jest|vi)\.spyOn\s*\(|from\s+['\"]sinon['\"]")),
+    ("C++ Google Mock", re.compile(r"#include\s*<gmock/gmock\.h>|\bEXPECT_CALL\s*\(|\bON_CALL\s*\(")),
+]
+
+# Patterns identifying integration test fixtures/harnesses
+INTEGRATION_HARNESS_PATTERNS = [
+    re.compile(r"\bWebApplicationFactory\b"),
+    re.compile(r"\bCliExecutionHarness\b|\bProcessStartInfo\b|\bProcess\.Start\b"),
+    re.compile(r"\bAsyncClient\b|\bTestClient\b|\bASGITransport\b|\bInMemorySessionClient\b"),
+    re.compile(r"@playwright/test|\bplaywright\b|\bpage\.goto\s*\("),
+    re.compile(r"\bTestWithParam\b|\bINSTANTIATE_TEST_SUITE_P\b|\bBoundarySweeps\b"),
+    re.compile(r"subprocess\.(?:Popen|run)\s*\("),
+]
+
+# Tautological assertion patterns (checked per-line)
+TAUTOLOGY_PATTERNS = [
+    re.compile(r"\bassert\s+([a-zA-Z_][a-zA-Z0-9_\.]*|\d+)\s*==\s*\1(?:\s*[,#\n\r]|$)"),
+    re.compile(r"\bself\.assertEqual\s*\(\s*([a-zA-Z_][a-zA-Z0-9_\.]*|\d+)\s*,\s*\1\s*(?:,[^)]*)?\)"),
+    re.compile(r"\bassert\s+(?:True|False)\b"),
+    re.compile(r"\bself\.assert(?:True|False)\s*\(\s*(?:True|False)\s*(?:,[^)]*)?\)"),
+    re.compile(r"\bAssert\.Equal\s*\(\s*([a-zA-Z_][a-zA-Z0-9_\.]*|\d+)\s*,\s*\1\s*(?:,[^)]*)?\)"),
+    re.compile(r"\bAssert\.True\s*\(\s*true\s*\)"),
+    re.compile(r"\bAssert\.True\s*\(\s*([a-zA-Z_][a-zA-Z0-9_\.]*|\d+)\s*==\s*\1\s*\)"),
+    re.compile(r"\bexpect\s*\(\s*([a-zA-Z_][a-zA-Z0-9_\.]*|\d+)\s*\)\s*\.\s*(?:toBe|toEqual|toStrictEqual)\s*\(\s*\1\s*\)"),
+    re.compile(r"\bexpect\s*\(\s*true\s*\)\s*\.\s*(?:toBe|toEqual)\s*\(\s*true\s*\)"),
+    re.compile(r"\b(?:EXPECT|ASSERT)_EQ\s*\(\s*([a-zA-Z_][a-zA-Z0-9_\.]*|\d+)\s*,\s*\1\s*\)"),
+    re.compile(r"\b(?:EXPECT|ASSERT)_TRUE\s*\(\s*true\s*\)"),
+]
+
+def is_test_file(path: Path) -> bool:
+    if path.suffix.lower() not in TEST_FILE_EXTENSIONS:
+        return False
+    lower_stem = path.stem.lower()
+    lower_parts = [p.lower() for p in path.parts]
+    is_test_named = "test" in lower_stem or "spec" in lower_stem
+    is_in_test_folder = any(p in {"test", "tests", "__tests__", "spec", "specs"} for p in lower_parts)
+    return is_test_named or is_in_test_folder
+
+def strip_block_comments_and_docstrings(content: str, suffix: str) -> str:
+    """Replaces block comments and docstrings with equivalent newlines to preserve line numbering."""
+    def replacer(match: re.Match) -> str:
+        return "\n" * match.group(0).count("\n")
+
+    if suffix in {".cs", ".ts", ".tsx", ".cpp", ".cc", ".cxx"}:
+        return re.sub(r"/\*.*?\*/", replacer, content, flags=re.DOTALL)
+    elif suffix == ".py":
+        return re.sub(r'""".*?"""|\'\'\'.*?\'\'\'', replacer, content, flags=re.DOTALL)
+    return content
+
+def strip_single_line_comments(content: str, suffix: str) -> str:
+    """Strips single-line comments (# for Python, // for C#/TS/C++) preserving string literals, URLs, and line numbers."""
+    if suffix == ".py":
+        comment_char = "#"
+        is_double_slash = False
+    elif suffix in {".cs", ".ts", ".tsx", ".cpp", ".cc", ".cxx"}:
+        comment_char = "/"
+        is_double_slash = True
+    else:
+        return content
+
+    result = []
+    i = 0
+    n = len(content)
+    in_quote: Optional[str] = None
+    escape = False
+
+    quote_chars = {'"', "'"}
+    if suffix in {".ts", ".tsx"}:
+        quote_chars.add("`")
+
+    while i < n:
+        ch = content[i]
+
+        if in_quote is not None:
+            result.append(ch)
+            if escape:
+                escape = False
+            elif ch == "\\":
+                escape = True
+            elif ch == in_quote:
+                in_quote = None
+            elif ch == "\n" and in_quote != "`":
+                in_quote = None
+                escape = False
+            i += 1
+        else:
+            if is_double_slash and ch == "/" and i + 1 < n and content[i + 1] == "/":
+                i += 2
+                while i < n and content[i] != "\n":
+                    i += 1
+            elif not is_double_slash and ch == comment_char:
+                i += 1
+                while i < n and content[i] != "\n":
+                    i += 1
+            elif ch in quote_chars:
+                in_quote = ch
+                result.append(ch)
+                i += 1
+            else:
+                result.append(ch)
+                i += 1
+
+    return "".join(result)
+
+def audit_test_theatre(repo_root: Path) -> Tuple[bool, List[str]]:
+    """
+    Audits test files across polyglot languages for test theatre anti-patterns:
+    1. Mock verification dominance over concrete state assertions.
+    2. Missing integration baselines when mock libraries are used.
+    3. Tautological assertions (e.g. Assert.Equal(x, x), assert y == y).
+    """
+    issues: List[str] = []
+
+    test_files: List[Path] = []
+    all_code_files: List[Path] = []
+
+    for path in repo_root.rglob("*"):
+        if not path.is_file() or is_excluded(path):
+            continue
+        if path.suffix.lower() in TEST_FILE_EXTENSIONS:
+            all_code_files.append(path)
+            if is_test_file(path):
+                test_files.append(path)
+
+    if not test_files:
+        return True, []
+
+    mock_frameworks_detected: List[str] = []
+    has_integration_harness = False
+
+    # Check for integration harnesses across all test and code files
+    for code_file in all_code_files:
+        try:
+            content = code_file.read_text(encoding="utf-8", errors="ignore")
+        except Exception:
+            continue
+
+        clean_content = strip_block_comments_and_docstrings(content, code_file.suffix.lower())
+        clean_content = strip_single_line_comments(clean_content, code_file.suffix.lower())
+        for harness_pattern in INTEGRATION_HARNESS_PATTERNS:
+            if harness_pattern.search(clean_content):
+                has_integration_harness = True
+                break
+        if has_integration_harness:
+            break
+
+    # Audit individual test files
+    for test_file in test_files:
+        try:
+            content = test_file.read_text(encoding="utf-8", errors="ignore")
+        except Exception:
+            continue
+
+        rel_path = test_file.relative_to(repo_root)
+        clean_content = strip_block_comments_and_docstrings(content, test_file.suffix.lower())
+        clean_content = strip_single_line_comments(clean_content, test_file.suffix.lower())
+
+        # Detect mock frameworks used
+        for fw_name, fw_pattern in MOCK_FRAMEWORK_PATTERNS:
+            if fw_pattern.search(clean_content):
+                if fw_name not in mock_frameworks_detected:
+                    mock_frameworks_detected.append(fw_name)
+
+        # Count mock calls and state assertions
+        mock_count = sum(len(pattern.findall(clean_content)) for pattern in MOCK_CALL_PATTERNS)
+        state_count = sum(len(pattern.findall(clean_content)) for pattern in STATE_ASSERTION_PATTERNS)
+
+        # Mock dominance check
+        if mock_count > 0 and state_count == 0:
+            issues.append(
+                f"{rel_path}: Mock verification dominance: file has {mock_count} mock verification(s) "
+                f"but 0 concrete state assertions (mock calls as sole assertions)."
+            )
+        elif mock_count > state_count:
+            issues.append(
+                f"{rel_path}: Mock-to-assertion ratio violation: mock verifications ({mock_count}) "
+                f"exceed concrete state assertions ({state_count})."
+            )
+
+        # Tautological assertions check
+        for line_no, line in enumerate(clean_content.splitlines(), start=1):
+            line_str = line.strip()
+            if not line_str or line_str.startswith(("#", "//", "/*", "*")):
+                continue
+            for tautology_pat in TAUTOLOGY_PATTERNS:
+                match = tautology_pat.search(line)
+                if match:
+                    issues.append(
+                        f"{rel_path}:{line_no}: Tautological assertion detected: '{match.group(0).strip()}'"
+                    )
+                    break
+
+    # Missing integration baseline check across the project
+    if mock_frameworks_detected and not has_integration_harness:
+        fws = ", ".join(mock_frameworks_detected)
+        issues.append(
+            f"Missing integration baseline: Repository uses mock frameworks ({fws}) "
+            f"but contains 0 integration harnesses (e.g. WebApplicationFactory, AsyncClient/TestClient, Playwright, or CLI execution harness)."
+        )
+
+    passed = len(issues) == 0
+    return passed, issues
+
+def check_test_theatre_audit(root_dir: Path) -> bool:
+    print("🔍 Auditing test suites for test theatre anti-patterns...")
+    passed, issues = audit_test_theatre(root_dir)
+    if not passed:
+        for issue in issues:
+            print(f"❌ {issue}")
+        return False
+    print("✅ All test suites passed anti-theatre audit.")
+    return True
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Release Verification Engine")
     parser.add_argument("--root", type=Path, default=None, help="Root directory to audit")
     parser.add_argument("--version", type=str, default=None, help="Target release version to verify")
     parser.add_argument("--skip-tests", action="store_true", help="Skip test suite execution")
     parser.add_argument("--ci", action="store_true", help="CI execution mode")
+    parser.add_argument("--audit-tests", action="store_true", help="Audit test suites for mock dominance and anti-patterns")
     args = parser.parse_args()
 
     root_dir = args.root.resolve() if args.root else Path.cwd().resolve()
@@ -269,12 +528,19 @@ def main() -> None:
         print(f"🎯 Target version: {target_version}")
     print("=" * 60)
 
-    v1 = check_semver_format(target_version)
-    v2 = check_changelog_headers(root_dir, target_version)
-    v3 = check_manifest_versions(root_dir, target_version)
-    v4 = check_markdown_links(root_dir)
+    checks: List[bool] = []
 
-    success = all([v1, v2, v3, v4])
+    if args.audit_tests and not args.skip_tests:
+        checks.append(check_test_theatre_audit(root_dir))
+
+    # Standard release verification checks
+    if not args.audit_tests or args.ci or target_version:
+        checks.append(check_semver_format(target_version))
+        checks.append(check_changelog_headers(root_dir, target_version))
+        checks.append(check_manifest_versions(root_dir, target_version))
+        checks.append(check_markdown_links(root_dir))
+
+    success = all(checks) if checks else True
     print("=" * 60)
     if success:
         print("✅ Release verification passed all quality gates.")

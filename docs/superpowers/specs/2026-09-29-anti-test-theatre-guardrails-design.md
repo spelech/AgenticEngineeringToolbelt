@@ -1,27 +1,33 @@
-# 🧪 Simulation & Control Harnesses: Observation, Testing & Feedback for Developers and AI
+# 🏛️ Architecture & Specification: Anti-Test-Theatre Guardrails & Representative Testing
 
-This guide defines simulation architecture, test harness conventions, and closed-loop verification practices. These practices guarantee software stability, deterministic performance, and $\ge$ 80% code coverage.
+**Date:** 2026-09-29  
+**Author:** Steven T. Pelech & Antigravity  
+**Status:** Approved  
+**Branch:** `feature/testGuardrails`  
 
 ---
 
-## 🎯 1. Software as an Observable Dynamic System & The Four Pillars
+## 1. Executive Summary
 
-### 1.1 Software as a Dynamic System
+This specification codifies comprehensive **Anti-Test-Theatre Guardrails** across the **Agentic Engineering Toolbelt** repository (`AgenticEngineeringToolbelt`) and its downstream templates.
 
-Software operates as a closed-loop dynamic system:
-1. **Observable States**: Systems expose internal states through diagnostic tap points, metrics, and health probes.
-2. **High-Volume & Parameter Sweeps**: Test harnesses simulate high-throughput stress, batch processing, and parameter sweeps to evaluate numeric stability and boundary limits.
-3. **Disturbance Ingestion**: Systems process imperfect inputs, synthetic latency, and abrupt disconnects to prove graceful recovery.
-4. **Closed-Loop Feedback**: Tests capture state responses, compute deltas, and return structured diagnostic envelopes for rapid developer and AI self-correction.
+### The Problem: Test Theatre in AI-Assisted and Modern Engineering
+In AI-assisted and fast-paced development environments, automated test suites often degrade into **"Test Theatre"**:
+- **Mock-Heavy Tautologies**: Agents construct elaborate mocks of internal domain interfaces. Tests verify that mocks were invoked rather than asserting that system state mutated correctly.
+- **Coverage Chasing Without Representation**: Suites achieve $\ge$ 80% line coverage by asserting trivial constructors, property getters/setters, and superficial happy paths while missing real-world boundary failures.
+- **Fragile Scaffolding vs. Real Deficiencies**: Tests break whenever implementation details refactor, yet fail to catch critical regressions that developers discover immediately upon dogfooding.
 
-### 1.2 The Four Pillars of Anti-Test Theatre
+### The Solution: Observable Systems & Representative Verification
+This specification eliminates test theatre by establishing:
+1. **The Four Pillars of Anti-Test Theatre**: Core engineering principles mandating real in-memory implementations, observable state assertions, automated dogfooding, and value-over-percentage coverage.
+2. **12-Dimension Banned vs. Mandated Patterns Matrix**: Explicit rules that classify common testing shortcuts as banned theatre and specify mandated engineering alternatives.
+3. **Deterministic Testing Protocols**: Mathematical algorithms for agents to compute exact test budgets (Basis Path + 0-1-N Boundary Rule) and evaluate dependency isolation (5-Question Mock Tree).
+4. **Polyglot Archetype Test Harness Recipes**: Copy-pasteable test harnesses for .NET 10, Python 3.12+, React + Vite, and C++20/23 that execute against real databases, HTTP pipelines, and processes.
+5. **Tooling & CI Quality Gates**: Static analysis heuristics in `verify_release.py` and GitHub Actions workflows to detect and flag mock-heavy test suites.
 
-In fast engineering environments, automated test suites often degrade into **"Test Theatre"**:
-- **Mock-Heavy Tautologies**: Agents construct elaborate mocks of internal domain interfaces. Tests verify that mocks were called rather than asserting state mutations.
-- **Coverage Chasing Without Representation**: Suites achieve high line coverage by asserting trivial constructors and property getters while missing real boundary failures.
-- **Fragile Scaffolding vs. Real Deficiencies**: Tests break whenever implementation details refactor, yet fail to catch critical regressions.
+---
 
-The **Four Pillars of Anti-Test Theatre** eliminate test theatre:
+## 2. The Four Pillars of Anti-Test Theatre
 
 ```mermaid
 flowchart TD
@@ -59,33 +65,26 @@ flowchart TD
     P4 --> RealSystem
 ```
 
-#### Pillar 1: Real Implementations Over Synthetic Mocks ("Real Over Mock")
+### 2.1 Pillar 1: Real Implementations Over Synthetic Mocks ("Real Over Mock")
 - Test software using real components and authentic in-memory equivalents rather than synthetic mocks.
 - Use SQLite in WAL mode with real schema migrations and Dapper queries instead of mocking `IRepository<T>` or `DbContext`.
-- **Strict Boundary Rule**: Mocking is strictly prohibited for internal domain services, business logic, and local storage.
-- Permit mocks **only** at unmanageable external third-party network boundaries (for example, Stripe, SendGrid, or OAuth providers) when local containers or stubs are unavailable.
+- **Strict Boundary Rule**: Mocking is strictly prohibited for internal domain services, business logic, and local storage. Mocks are permitted **only** at unmanageable external third-party network boundaries (e.g., Stripe, SendGrid, external identity providers) where local containers or recorded stubs are unavailable.
 
-#### Pillar 2: Observable State & Behavioral Assertions ("Outcomes Over Calls")
+### 2.2 Pillar 2: Observable State & Behavioral Assertions ("Outcomes Over Calls")
 - Assertions must evaluate observable outcomes: updated database records, generated files, API response payloads, emitted domain events, or state machine transitions.
-- **Banned Assertion**: Verifying mock invocation counts (such as `mock.Verify(x => x.Save(), Times.Once)`) as the primary proof of functionality is classified as test theatre.
-- If data changes, assert the mutation directly in the persistent data store or response payload.
+- **Banned Assertion**: Verifying mock invocation counts (such as `mock.Verify(x => x.Save(), Times.Once)`) as the primary proof of functionality is classified as test theatre. If data changed, assert the change in the data store.
 
-#### Pillar 3: Mandatory Representative Dogfooding & Smoke Loops ("Eat Your Own Food")
-- Every feature requires a representative end-to-end journey or CLI/API roundtrip before claiming completion.
-- If you build a CLI command, execute that CLI command via a real subprocess against temporary files.
-- If you build an API endpoint, execute a full HTTP request-response cycle through the entire middleware stack.
+### 2.3 Pillar 3: Mandatory Representative Dogfooding & Smoke Loops ("Eat Your Own Food")
+- Every feature must incorporate a representative end-to-end journey or CLI/API roundtrip before an agent or developer claims completion.
+- If an agent builds a CLI command, the test harness must execute that CLI command via a real subprocess against temporary files. If an agent builds an API endpoint, it must execute a full HTTP request-response cycle through the entire middleware stack.
 
-#### Pillar 4: Value-Driven Testing Over Numeric Vanity ("Stress Over Percentage")
+### 2.4 Pillar 4: Value-Driven Testing Over Numeric Vanity ("Stress Over Percentage")
 - High line-coverage numbers achieved by testing trivial POCO properties, record constructors, or mock setups provide false confidence.
 - Prioritize boundary conditions, edge cases, synthetic disturbances (socket disconnects, malformed inputs, timeouts), and concurrency over shallow line coverage.
-- Do not write tests for boilerplate POCOs, DTOs, or auto-properties.
-- Focus test budgets strictly on domain logic, calculation rules, edge cases, state transitions, and integration boundaries.
 
 ---
 
-## 🚫 2. Banned vs. Mandated Patterns Matrix (12 Engineering Dimensions)
-
-The following matrix establishes strict standards across twelve engineering dimensions. It classifies common testing shortcuts as banned test theatre and defines mandated engineering alternatives:
+## 3. Banned vs. Mandated Patterns Matrix (12 Engineering Dimensions)
 
 | Dimension | 🚫 Banned Anti-Pattern (Test Theatre) | ✅ Mandated Engineering Standard (Real Verification) |
 | :--- | :--- | :--- |
@@ -104,18 +103,17 @@ The following matrix establishes strict standards across twelve engineering dime
 
 ---
 
-## 🧮 3. Deterministic Testing Protocols for AI Agents
+## 4. Deterministic Testing Algorithms for AI Agents
 
-To eliminate guesswork and subjective choices, agents follow two mechanical algorithms before authoring test suites:
+To eliminate guesswork and subjective choices, agents follow two mechanical algorithms before authoring test suites.
 
-### 3.1 Deterministic Test Budget Formula
-
+### 4.1 Deterministic Test Budget Formula
 Agents analyze the function or feature Abstract Syntax Tree (AST) to compute the exact required test suite budget:
 
-$$\text{Test Budget} = \text{Nominal (1)} + N_{\text{Branches}} + N_{\text{0-1-N Boundaries}} + N_{\text{Disturbances}}$$
+$$\text{Test Budget} = \text{Nominal (1)} + N_{\text{Decision Branches}} + N_{\text{0-1-N Boundaries}} + N_{\text{Disturbances}}$$
 
 1. **Nominal Path ($= 1$)**: Exactly one test exercising the happy path with valid nominal data.
-2. **Decision & Guard Branches ($= N_{\text{Branches}}$)**: Exactly one test per independent branch (`if`, `switch`, validation guard, explicit `throw`).
+2. **Decision & Guard Branches ($= N_{\text{branches}}$)**: Exactly one test per independent branch (`if`, `switch`, validation guard, explicit `throw`).
 3. **0-1-N Boundary Conditions ($= 1 \text{ to } 3$)**:
    - `0`: Empty collection, null parameter, or zero value.
    - `1`: Single element or minimum boundary threshold.
@@ -134,15 +132,8 @@ flowchart LR
     T1 & T2 & T3 & T4 --> CompleteSuite["Exact Deterministic Test Matrix"]
 ```
 
-### 3.2 Deterministic 5-Question Mock Decision Tree
-
-Pass every candidate dependency through this 5-question tree before creating any mock or stub:
-1. **Is the dependency internal to the current solution?** If yes, use the real component via DI or direct instantiation.
-2. **Is it a database or persistent store?** If yes, use a real in-memory database (SQLite WAL or ephemeral instance).
-3. **Is it system clock or non-deterministic time?** If yes, use a time abstraction (`TimeProvider` or time-machine).
-4. **Is it an external 3rd-party HTTP API (e.g. Stripe, SendGrid)?** If yes, use a contract stub (`WireMock.Net` or `respx`). Never mock internal interfaces!
-5. **Is it child process STDIO or an OS pipe?** If yes, use synthetic transport (`mock_stdio.js`) with fault injection.
-- If you answer "No" to all five questions, **mocking is forbidden**. Use the real implementation.
+### 4.2 Deterministic 5-Question Mock Decision Tree
+Before creating any mock or stub, agents pass the target dependency through this decision tree:
 
 ```mermaid
 flowchart TD
@@ -165,205 +156,9 @@ flowchart TD
 
 ---
 
-## ⏱️ 4. Tiered Testing Cadence ("Test When It Makes Sense")
+## 5. Polyglot Archetype Test Harness Recipes
 
-Running slow or brittle integration suites during rapid prototyping stalls development momentum. Use a tiered cadence to balance iteration speed with system reliability:
-
-```mermaid
-flowchart TD
-    subgraph T1["Tier 1: Inner Loop (On Demand)"]
-        Unit["Fast Unit Tests<br>In-memory, isolated domain logic assertions"]
-    end
-    subgraph T2["Tier 2: Stabilization Gate (Pre-Manual)"]
-        Integ["Targeted Integration Tests<br>Boundary contracts & external stubs"]
-    end
-    subgraph T3["Tier 3: Quality Gate (Pre-PR / Pre-Release / CI)"]
-        Matrix["Pairwise & Multi-Provider Matrix"]
-        Sim["Simulation Harnesses & Stress Loops"]
-        E2E["Playwright Layout Inspector & E2E"]
-        Smoke["Fullstack Smoke Gate"]
-    end
-
-    T1 -->|Interfaces Stabilize| T2
-    T2 -->|Manual Verification Passes| T3
-    Matrix --> Sim --> E2E --> Smoke
-```
-
-### 4.1 Tier 1: Inner Loop / Rapid Development
-- Execute fast, isolated in-memory unit tests on demand.
-- Do not mandate test runs while exploring early drafts, prototypes, or rapidly changing contracts.
-- Focus on fast feedback for core algorithms, data transformations, and pure functions.
-
-### 4.2 Tier 2: Stabilization Gate / Pre-Manual Verification
-- Trigger once feature interfaces, API signatures, and data boundaries stabilize.
-- Run unit test suites and targeted integration tests immediately before manual testing.
-- Catch contract breakages and regressions before spending human or agent verification time.
-
-### 4.3 Tier 3: Pre-PR / Pre-Release / CI Quality Gate
-- Run full test matrix, multi-provider integration suites, and simulation harnesses.
-- Execute Playwright layout audits across mobile and desktop viewports.
-- Enforce the $\ge$ 80% code coverage target and verify zero warnings.
-- Block merges into `develop` or `main` until all gate stages pass cleanly.
-
----
-
-## 🏗️ 5. When to Build a Dedicated Simulation Harness
-
-Build a dedicated simulation harness whenever:
-1. **Crossing an Architectural Boundary**: An external API, database, child process STDIO, SSE stream, or network protocol enters the architecture.
-2. **Implementing Tunable Algorithms**: Logic has variability, numeric convergence, thresholding, sorting, or scoring that requires parameter sweeping.
-3. **Stateful Protocols & Daemons**: Systems use background workers, queue consumers (`Channel<T>`), or multi-step transaction pipelines.
-
----
-
-## ⚙️ 6. Harness Types & Simulation Patterns
-
-### 6.1 High-Volume & Stress Loop Harness
-Wrap the component under test in a high-volume execution loop feeding batches of synthetic or recorded inputs:
-
-```csharp
-// Example: High-Volume C# Closed-Loop Harness
-public class HighVolumeSimulationHarness
-{
-    private readonly IProcessingEngine _engine;
-
-    public async Task<HarnessResult> RunBatchAsync(int batchSize, CancellationToken ct)
-    {
-        var transitions = new List<StateTransition>();
-        var sw = Stopwatch.StartNew();
-
-        for (int i = 0; i < batchSize; i++)
-        {
-            var payload = GenerateSyntheticPayload(i);
-            var result = await _engine.ProcessAsync(payload, ct);
-            transitions.Add(new StateTransition(i, result.State, sw.ElapsedMilliseconds));
-        }
-
-        return new HarnessResult(batchSize, transitions, sw.Elapsed);
-    }
-}
-```
-
-### 6.2 Synthetic Mock Transports (`mock_stdio.js`)
-Simulate child process STDIO with controllable latency, stdout buffering, stderr emission, and abrupt process termination:
-
-```javascript
-// mock_stdio.js - Simulates asynchronous JSON-RPC communication & disconnects
-const readline = require('readline');
-const rl = readline.createInterface({ input: process.stdin, output: process.stdout, terminal: false });
-
-rl.on('line', (line) => {
-  try {
-    const req = JSON.parse(line);
-    if (req.method === 'trigger_disconnect') {
-      process.exit(1); // Abrupt crash to test reconnection
-    }
-    setTimeout(() => {
-      if (req.method === 'ping') {
-        console.log(JSON.stringify({ jsonrpc: '2.0', id: req.id, result: 'pong' }));
-      }
-    }, 50);
-  } catch (err) {
-    process.stderr.write(`Malformed JSON: ${line}\n`);
-  }
-});
-```
-
-### 6.3 Disturbance Injection
-Inject failures specifically to test error fallbacks and graceful degradation:
-- **Malformed Payloads**: Ingest corrupt JSON, truncated strings, and invalid encodings.
-- **Abrupt Disconnects**: Terminate child processes or socket streams mid-handshake to verify `CancellationToken` cleanup and retry logic.
-- **Latency Spikes**: Inject artificial delays to verify timeout thresholds and circuit breakers.
-
----
-
-## 🔍 7. Diagnostic Tap Points & Agent Introspection
-
-### Development Tap Point Protocol
-During development and debugging:
-1. **Inject Hooks**: Inject internal diagnostic hooks (e.g. event subscriptions, state snapshot getters, in-memory ring buffers).
-2. **Inspect Internals**: Test harnesses subscribe to these hooks to assert internal state transitions without relying on unstructured log parsing.
-3. **Clean Up**: Remove or compile-guard debug hooks before production release.
-
----
-
-## 📐 8. UI Layout Stability & Ergonomics Auditing
-
-Frontends integrate **`playwright-layout-inspector`** with `data-testid` attributes to catch visual regressions and accessibility defects:
-
-```typescript
-import { test, expect } from '@playwright/test';
-import 'playwright-layout-inspector/matchers';
-
-test.describe('Responsive Layout & Ergonomics Audit', () => {
-  test('audit page layout across viewports', async ({ page }) => {
-    await page.goto('/');
-
-    // 1. Assert zero unwanted horizontal scrollbars or element bleed
-    await expect(page).toHaveNoLayoutOverflow();
-
-    // 2. Assert mobile viewport & zoom readiness
-    await expect(page).toHaveMobileFit();
-
-    // 3. Assert touch targets meet WCAG standards (>= 24px)
-    await expect(page).toHaveTouchFriendlyTargets({ minSize: 24 });
-
-    // 4. Assert overall layout UX score is Grade A
-    await expect(page).toPassLayoutAudit({ minScore: 85 });
-  });
-});
-```
-
----
-
-## 📋 9. The 6-Part Agent Feedback Envelope
-
-When a test harness, integration test, or simulation loop fails, the failure output MUST be packaged in a standardized diagnostic envelope:
-
-```json
-{
-  "status": "FAILED",
-  "test_name": "Test_HighThroughput_OrderBatch_Convergence",
-  "inputs": {
-    "batch_size": 1000,
-    "concurrency_limit": 16,
-    "seed": 42
-  },
-  "assumptions": [
-    "Database connection pool size >= 20",
-    "Channel buffer capacity >= 500"
-  ],
-  "active_settings": {
-    "journal_mode": "WAL",
-    "synchronous": "NORMAL",
-    "busy_timeout": 5000
-  },
-  "action_history": [
-    { "step": 1, "action": "SpawnWorkerPool", "status": "OK" },
-    { "step": 2, "action": "Enqueue500Items", "status": "OK" },
-    { "step": 3, "action": "SimulateDisconnect", "status": "TRIGGERED" },
-    { "step": 4, "action": "DrainChannel", "status": "TIMEOUT" }
-  ],
-  "output_delta": {
-    "expected_processed": 500,
-    "actual_processed": 482,
-    "unprocessed_delta": 18
-  },
-  "captured_logs": [
-    "ERROR [Worker-3] CancellationTokenSource timed out after 5000ms",
-    "WARN [Pool] Connection dropped during transaction commit"
-  ],
-  "reproduction_command": "dotnet test --filter \"FullyQualifiedName=Harness.Test_HighThroughput\" -- --seed 42"
-}
-```
-
----
-
-## 🍳 10. Polyglot Archetype Test Harness Recipes
-
-The following recipes demonstrate representative verification harnesses across our supported polyglot archetypes.
-
-### 10.1 C# (.NET 10) Fullstack & CLI
+### 5.1 C# (.NET 10) Fullstack & CLI
 
 #### Web API Integration Harness (`WebApplicationFactory` + In-Memory SQLite)
 ```csharp
@@ -424,7 +219,7 @@ public class CliExecutionHarness : IDisposable
 }
 ```
 
-### 10.2 Python (3.12+) FastAPI & FastMCP
+### 5.2 Python (3.12+) FastAPI & FastMCP
 
 #### ASGI In-Memory Transport with SQLite
 ```python
@@ -457,7 +252,7 @@ async def test_mcp_tool_execution():
         assert "convergence_score" in result.content[0].text
 ```
 
-### 10.3 TypeScript / React (Vite)
+### 5.3 React + TypeScript (Vite)
 
 #### Playwright E2E User Journey & Layout Inspection
 ```typescript
@@ -485,7 +280,7 @@ test.describe('Order Management User Journey', () => {
 });
 ```
 
-### 10.4 C++ (C++20/23) Native Algorithms
+### 5.4 C++ (C++20/23) Native Algorithms
 
 #### Parameter Sweeps & Boundary Stress Harness
 ```cpp
@@ -517,3 +312,33 @@ INSTANTIATE_TEST_SUITE_P(
     )
 );
 ```
+
+---
+
+## 6. Verification Tooling & CI Quality Gates
+
+### 6.1 Static Test Theatre Audit in `templates/scripts/verify_release.py`
+We introduce an `--audit-tests` flag to `verify_release.py`:
+1. **Mock-to-Assertion Ratio**: Scans test files for mock setup/verification invocations (`.Verify(`, `assert_called_with`, `mock.patch`) versus concrete state assertions (`Assert.Equal`, `assert ==`, `expect(`). Flags files where mock verifications exceed state assertions.
+2. **Missing Integration Baseline**: Inspects repositories containing test suites. If unit test files use mock frameworks but no integration harness exists (`WebApplicationFactory`, `AsyncClient`, `Playwright`, or CLI runner), the audit fails or issues a warning.
+3. **Tautological Assertion Scan**: Scans for assertions comparing variables to themselves (`Assert.Equal(x, x)`) or verifying mock calls as sole test assertions.
+
+### 6.2 GitHub Actions Tier 2 CI Integration
+Update `templates/workflows/ci.yml` and `.github/workflows/ci.yml` to execute:
+```bash
+python3 templates/scripts/verify_release.py --audit-tests
+```
+during the Tier 2 quality gate before allowing pull request merges.
+
+---
+
+## 7. Affected Files & Artifacts
+
+| Component | Target Files | Changes |
+| :--- | :--- | :--- |
+| **Agent Rules** | `rules/AGENTS.md`<br>`rules/CLAUDE.md`<br>`rules/GEMINI.md` | Add Anti-Test-Theatre section, Banned vs. Mandated table summary, and deterministic testing protocols. |
+| **Standards** | `standards/TESTING_HARNESS_PATTERNS.md`<br>`standards/ENGINEERING_STYLE_GUIDE.md` | Expand Section 2 with 4 Pillars, 12-dimension matrix, test budget formula, mock tree, and archetype recipes. |
+| **Skills** | `.agents/skills/test-harness-builder/SKILL.md`<br>`.agents/skills/engineering-archetype/SKILL.md` | Embed deterministic budget calculation and mock decision tree into agent instructions. |
+| **Archetypes** | `archetypes/fullstack-dotnet-react.md`<br>`archetypes/console-cli-dotnet.md`<br>`archetypes/python-fastapi-mcp.md`<br>`archetypes/react-ts-vite-ui.md`<br>`archetypes/native-cpp-algorithms.md` | Update testing sections with representative dogfood harness recipes. |
+| **Scripts & CI** | `templates/scripts/verify_release.py`<br>`templates/workflows/ci.yml`<br>`.github/workflows/ci.yml` | Implement `--audit-tests` check and wire into CI quality gate. |
+| **Living Docs** | `docs/standards/testing-harness-patterns.md`<br>`docs/rules/agents.md`<br>`docs/archetypes/*` | Synchronize all documentation into VitePress site. |

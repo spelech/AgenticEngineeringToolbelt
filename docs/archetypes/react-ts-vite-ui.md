@@ -106,27 +106,35 @@ export const useServerStore = create<ServerState>((set) => ({
 
 ---
 
-## 📐 Playwright Layout Inspector Quality Gate
+## 🧪 Representative Test Harness: Playwright E2E & Layout Audit
+
+Execute realistic operator user journeys against live running frontend applications. Do not write shallow component tests that mock sub-components with empty `<div>` tags. Avoid fragile DOM snapshot testing. Validate user inputs, state transitions, and visible DOM changes. Combine functional interaction checks with the mandatory 4-point layout inspector audit:
+1. Zero horizontal layout overflow (`toHaveNoLayoutOverflow`).
+2. Mobile viewport fit (`toHaveMobileFit`).
+3. Touch target ergonomics ($\ge$ 24px) (`toHaveTouchFriendlyTargets`).
+4. Composite layout quality score ($\ge$ 85) (`toPassLayoutAudit`).
 
 ```typescript
-// tests/e2e/layout-audit.spec.ts
+// tests/e2e/order-journey.spec.ts
 import { test, expect } from '@playwright/test';
 import 'playwright-layout-inspector/matchers';
 
-test.describe('Automated Layout & UX Audit', () => {
-  test('audit page across desktop and mobile viewports', async ({ page }) => {
+test.describe('Order Management User Journey', () => {
+  test('operator can submit order and view updated table', async ({ page }) => {
     await page.goto('/');
 
-    // 1. Assert zero horizontal overflow or clipping
+    await page.getByTestId('sku-input').fill('SKU-999');
+    await page.getByTestId('quantity-input').fill('10');
+    await page.getByTestId('submit-order-btn').click();
+
+    const row = page.getByTestId('order-row-SKU-999');
+    await expect(row).toBeVisible();
+    await expect(row.getByTestId('order-status')).toHaveText('Pending');
+
+    // 4-Point Ergonomics & Layout Audit
     await expect(page).toHaveNoLayoutOverflow();
-
-    // 2. Assert mobile viewport fitting & scaling
     await expect(page).toHaveMobileFit();
-
-    // 3. Assert touch target ergonomics (>= 24px)
     await expect(page).toHaveTouchFriendlyTargets({ minSize: 24 });
-
-    // 4. Assert composite layout score meets Grade A
     await expect(page).toPassLayoutAudit({ minScore: 85 });
   });
 });

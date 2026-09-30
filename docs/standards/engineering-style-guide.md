@@ -61,7 +61,7 @@ gitGraph
 2. **File Size & Cohesion Limit**: Classes or files exceeding **500 lines of code** must be broken down into focused partial classes, sub-services, or distinct domain helpers.
 3. **Open / Closed**: Design for pluggability and extensibility without modifying core engine logic.
 4. **Interface Segregation**: Enforce narrow, client-focused interfaces (`IStateReader`, `IStateWriter`, `IHealthCheckable`) over fat monolithic interfaces.
-5. **Dependency Inversion**: High-level modules must depend on abstractions. **Build interfaces (`I*`) even for single implementations** to ensure 100% testability, mockability, and loose coupling.
+5. **Dependency Inversion**: High-level modules must depend on abstractions. **Build interfaces (`I*`) even for single implementations** to ensure 100% testability, substitutability, and loose coupling.
 
 ### 2.2 DRY vs. YAGNI & KISS
 1. **Rule of Three for DRY**: Duplication is acceptable across 2 instances if contexts or data shapes differ slightly. Refactor into a shared utility or generic abstraction on the **3rd occurrence**.
@@ -75,6 +75,11 @@ gitGraph
    - **Interfaces**: C# interfaces MUST use the `I` prefix (`IDbConnectionFactory`, `ITransportChannel`). TypeScript/Python interfaces use descriptive role names or `*able` traits.
    - **UI Components**: Name strictly after the visual entity or view role (`ServerStatusCard`, `DeviceListTable`, `HeaderNavbar`). Never name components after temporary feature names, tasks, or git branches.
    - **Zustand Stores**: Prefix with `use*Store.ts` (`useAuthStore.ts`, `useServerStore.ts`).
+3. **Banned Code Smell: Mock-Heavy Test Theatre**:
+   - Mock-heavy unit testing without authentic integration tests is strictly prohibited as a banned code smell.
+   - Mocking domain repositories, business services, or internal interfaces produces brittle test theatre that passes while production breaks.
+   - Asserting mock invocations (such as `mock.Verify()`) rather than observable state mutations provides false confidence.
+   - Always adhere to the Four Pillars and 12-Dimension Matrix in [**TESTING_HARNESS_PATTERNS.md**](/standards/testing-harness-patterns).
 
 ### 2.4 Performance & Efficiency Discipline
 1. **Database Trips**: If an operation requires 3+ database round-trips or multi-table joins, consolidate into a single **Stored Procedure** or multi-result batch query.
@@ -155,9 +160,15 @@ flowchart TD
 
 ---
 
-## 🧪 6. Simulation & Control Harnesses (For Developers & AI)
+## 🧪 6. Testing, Code Quality & Simulation Harnesses (For Developers & AI)
 
 - **Controls Mindset**: Software operates as an observable dynamic system requiring continuous state inspection, actuation, and closed-loop feedback. Build dedicated test harnesses whenever crossing an API/network boundary, managing stateful protocols, or implementing algorithms with tunable variability.
+- **Anti-Test Theatre & Representative Verification**:
+  - Test suites must verify real system behaviors and observable state outcomes, never mock tautologies.
+  - **Banned Code Smell**: Mock-heavy unit testing without authentic integration tests is strictly prohibited. Mocking internal interfaces, repositories, or service boundaries produces brittle test theatre that passes while production breaks.
+  - **The Four Pillars**: Enforce four pillars: (1) Real Over Mock, (2) Outcomes Over Calls, (3) Representative Dogfooding, (4) Value Over Vanity.
+  - **Deterministic Testing Protocols**: Compute required test budgets using the Deterministic Test Budget Formula ($1 + \text{Branches} + \text{Boundaries} + \text{Disturbances}$). Evaluate every dependency with the 5-Question Mock Decision Tree before introducing any test double.
+  - Review the complete 12-Dimension Banned vs. Mandated Patterns Matrix and polyglot recipes in [**TESTING_HARNESS_PATTERNS.md**](/standards/testing-harness-patterns).
 - **Dynamic System Observation & Stress Capabilities**:
   - **Diagnostic Tap Points**: Agents inject internal diagnostic hooks (in-memory ring buffers, state transition listeners, and frontend `data-testid` attributes) during development to expose internal state without relying on string log scraping. Clean up or compile-guard debug hooks before production release.
   - **High-Volume Simulation Loops**: Harnesses execute high-volume throughput stress loops, synthetic batch feeds, parameter sweeps, and convergence tests to detect race conditions, memory leaks, and performance drift under load.
@@ -178,7 +189,7 @@ flowchart TD
     - Run unit test suites and targeted integration tests once feature interfaces and domain boundaries stabilize, immediately prior to developer or agent manual testing.
   - **Tier 3 (Pre-PR / Pre-Release / CI Quality Gate)**:
     - Execute full test matrix, multi-provider integration tests, high-volume simulation harnesses, and Playwright layout audits before merging into `develop`/`main` and within CI pipelines.
-- **Coverage Target**: $\ge$ 80% code coverage across unit, integration, and E2E suites.
+- **Coverage Target**: $\ge$ 80% code coverage across unit, integration, and E2E suites. Do not count boilerplate or trivial POCO tests toward this goal.
 
 ---
 

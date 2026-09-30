@@ -19,7 +19,7 @@ description: "Production-grade CLI utilities with Specter.Console and command ro
 | **Logging & Output** | `ILogger` + `--json` Output Stream | Human-friendly console logs + structured JSON mode for agent consumption. |
 | **Packaging & Binary** | Framework-Dependent + Native AOT Ready | `<PublishAot>` compatibility for instant startup when required. |
 | **Persistence** | SQLite WAL / Dapper (if required) | `IDbConnectionFactory`, stored procedure `.sql` files. |
-| **Testing** | xUnit + NSubstitute | Simulation test harnesses with mock process STDIO and cancellation token tests. |
+| **Testing** | xUnit + Subprocess Fixtures | Simulation test harnesses with real subprocess execution and cancellation token tests. |
 
 ---
 
@@ -101,3 +101,41 @@ Every CLI tool must support standard agent inspection flags:
 1. **`--json`**: Emits raw JSON objects to `stdout` for autonomous agent parsing.
 2. **`--dry-run`**: Validates parameters, queries external state, and simulates processing without destructive writes.
 3. **`-v / -vv / -vvv`**: Increases logging verbosity and dumps internal ring buffer diagnostics upon failure.
+
+---
+
+## 🧪 Representative Subprocess Test Harness Recipe
+
+Always test CLI commands through real subprocess execution. Do not mock command handlers or parse methods directly. The `CliExecutionHarness` executes the CLI binary or `dotnet run` inside an isolated temporary workspace directory.
+
+```csharp
+public class CliExecutionHarness : IDisposable
+{
+    public string TempWorkspace { get; } = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+
+    public CliExecutionHarness() => Directory.CreateDirectory(TempWorkspace);
+
+    public async Task<(int ExitCode, string StdOut, string StdErr)> ExecuteAsync(params string[] args)
+    {
+        var psi = new ProcessStartInfo("dotnet", string.Join(" ", args))
+        {
+            WorkingDirectory = TempWorkspace,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true
+        };
+        using var proc = Process.Start(psi)!;
+        var stdout = await proc.StandardOutput.ReadToEndAsync();
+        var stderr = await proc.StandardError.ReadToEndAsync();
+        await proc.WaitForExitAsync();
+        return (proc.ExitCode, stdout, stderr);
+    }
+
+    public void Dispose() => Directory.Delete(TempWorkspace, recursive: true);
+}
+```
+
+### Verification Guidelines
+- Assert expected process exit codes (`0` for success, non-zero for handled errors).
+- Assert machine-readable stdout outputs when `--json` flag is provided.
+- Assert expected filesystem mutations inside `TempWorkspace`.
+- Test failure conditions with invalid arguments, simulated timeouts, and non-zero exit codes.

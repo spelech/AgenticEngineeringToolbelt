@@ -44,6 +44,9 @@ jobs:
       - name: Run tests with coverage
         run: dotnet test --configuration Release --no-build --collect:"XPlat Code Coverage" --results-directory ./TestResults
 
+      - name: Audit Test Theatre & Mock Dominance
+        run: python3 templates/scripts/verify_release.py --audit-tests
+
       - name: Upload Test Results
         if: always()
         uses: actions/upload-artifact@v4

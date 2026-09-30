@@ -151,8 +151,47 @@ async def health_check():
 
 ---
 
-## 🧪 5. Testing Cadence
+## 🧪 5. Testing Cadence & Representative Test Recipes
 
-- **Tier 1 (Inner Loop)**: Unit tests for `core/engine.py`, Pydantic models, and FastAPI `TestClient` route tests.
-- **Tier 2 (Stabilization Gate)**: Integration tests validating FastMCP tool execution, diagnostic tap points, and synthetic simulation loops.
+Testing adheres to the tiered cadence and enforces real transports over synthetic mocks:
+
+- **Tier 1 (Inner Loop)**: Unit tests for `core/engine.py`, Pydantic models, and fast ASGI in-memory client route tests.
+- **Tier 2 (Stabilization Gate)**: Integration tests validating FastMCP tool execution via `InMemorySessionClient`, diagnostic tap points, and synthetic simulation loops.
 - **Tier 3 (CI / Release)**: Multi-stage CI pipeline, ruff linter gate (0 errors), and $\ge$ 80% coverage threshold.
+
+### 5.1 ASGI In-Memory Transport with SQLite (FastAPI Integration)
+
+Always test FastAPI endpoints through real asynchronous HTTP roundtrips. Use `httpx.AsyncClient` with `ASGITransport(app=app)`. Connect to an ephemeral in-memory or temporary SQLite database. Validate full routing, dependency injection, and middleware. Do not patch internal domain logic with `unittest.mock.patch`.
+
+```python
+import pytest
+from httpx import ASGITransport, AsyncClient
+from app.main import app
+from app.database import init_db
+
+@pytest.fixture
+async def client(tmp_path):
+    test_db = f"sqlite+aiosqlite:///{tmp_path}/test.db"
+    await init_db(test_db)
+    
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as ac:
+        yield ac
+```
+
+### 5.2 FastMCP In-Memory Session Client (Agent Tool Verification)
+
+Always test FastMCP tools through `InMemorySessionClient`. Exercise live tool execution and validate structured output schemas. Avoid external subprocesses or network socket overhead. Assert observable return payloads and database state changes.
+
+```python
+import pytest
+from mcp.client.inmemory import InMemorySessionClient
+from app.mcp_server import mcp
+
+@pytest.mark.asyncio
+async def test_mcp_tool_execution():
+    async with InMemorySessionClient(mcp) as session:
+        result = await session.call_tool("calculate_metrics", arguments={"sample_rate": 100})
+        assert result.content[0].text is not None
+        assert "convergence_score" in result.content[0].text
+```
