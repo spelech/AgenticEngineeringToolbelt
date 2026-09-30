@@ -8,7 +8,7 @@ description: "Google Antigravity and Gemini CLI engineering standards and execut
 This repository adheres to the architecture, coding standards, test harness conventions, and CI/CD quality gates codified in `AgenticEngineeringToolbelt`.
 
 ## 📌 Master Rules Reference
-Always follow all guidelines in [**AGENTS.md**](/rules/agents) and [**Engineering Style Guide**](/standards/engineering-style-guide).
+Always follow all guidelines in [**AGENTS.md**](/rules/agents), [**ENGINEERING_STYLE_GUIDE.md**](/standards/engineering-style-guide), and [**TESTING_HARNESS_PATTERNS.md**](/standards/testing-harness-patterns).
 
 ## ⚡ Active Skills
 - `engineering-archetype`: Master architectural standards across C#, Python, TS, and C++.
@@ -21,4 +21,5 @@ Always follow all guidelines in [**AGENTS.md**](/rules/agents) and [**Engineerin
 3. **Simulation & Control Harnesses**: Treat software as an observable dynamic system. Build diagnostic tap points, stress loops, disturbance injection, and 6-part feedback envelopes.
 4. **Tiered Testing Cadence**: Tier 1 (inner loop on demand), Tier 2 (stabilization gate before manual testing), Tier 3 (full matrix, harness sweeps, and Playwright audits before PR/release).
 5. **Living Documentation & ASD-STE100**: Apply ASD-STE100 rules ($\le$ 20-25 words per sentence, active voice, imperative mood). Embed native Mermaid diagrams. Publish via VitePress.
+6. **Anti-Test Theatre & Representative Verification**: Test with real implementations like SQLite WAL, real DI, and full HTTP roundtrips. Never mock internal interfaces or repositories. Never use `mock.Verify()` as the primary assertion. Compute test budgets deterministically ($1 + \text{Branches} + \text{Boundaries} + \text{Disturbances}$). Follow the 5-Question Mock Decision Tree in [**AGENTS.md**](/rules/agents) and [**TESTING_HARNESS_PATTERNS.md**](/standards/testing-harness-patterns).
 
