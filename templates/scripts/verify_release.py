@@ -314,6 +314,8 @@ INTEGRATION_HARNESS_PATTERNS = [
 TAUTOLOGY_PATTERNS = [
     re.compile(r"\bassert\s+([a-zA-Z_][a-zA-Z0-9_\.]*|\d+)\s*==\s*\1(?:\s*[,#\n\r]|$)"),
     re.compile(r"\bself\.assertEqual\s*\(\s*([a-zA-Z_][a-zA-Z0-9_\.]*|\d+)\s*,\s*\1\s*(?:,[^)]*)?\)"),
+    re.compile(r"\bassert\s+(?:True|False)\b"),
+    re.compile(r"\bself\.assert(?:True|False)\s*\(\s*(?:True|False)\s*(?:,[^)]*)?\)"),
     re.compile(r"\bAssert\.Equal\s*\(\s*([a-zA-Z_][a-zA-Z0-9_\.]*|\d+)\s*,\s*\1\s*(?:,[^)]*)?\)"),
     re.compile(r"\bAssert\.True\s*\(\s*true\s*\)"),
     re.compile(r"\bAssert\.True\s*\(\s*([a-zA-Z_][a-zA-Z0-9_\.]*|\d+)\s*==\s*\1\s*\)"),
@@ -342,6 +344,61 @@ def strip_block_comments_and_docstrings(content: str, suffix: str) -> str:
     elif suffix == ".py":
         return re.sub(r'""".*?"""|\'\'\'.*?\'\'\'', replacer, content, flags=re.DOTALL)
     return content
+
+def strip_single_line_comments(content: str, suffix: str) -> str:
+    """Strips single-line comments (# for Python, // for C#/TS/C++) preserving string literals, URLs, and line numbers."""
+    if suffix == ".py":
+        comment_char = "#"
+        is_double_slash = False
+    elif suffix in {".cs", ".ts", ".tsx", ".cpp", ".cc", ".cxx"}:
+        comment_char = "/"
+        is_double_slash = True
+    else:
+        return content
+
+    result = []
+    i = 0
+    n = len(content)
+    in_quote: Optional[str] = None
+    escape = False
+
+    quote_chars = {'"', "'"}
+    if suffix in {".ts", ".tsx"}:
+        quote_chars.add("`")
+
+    while i < n:
+        ch = content[i]
+
+        if in_quote is not None:
+            result.append(ch)
+            if escape:
+                escape = False
+            elif ch == "\\":
+                escape = True
+            elif ch == in_quote:
+                in_quote = None
+            elif ch == "\n" and in_quote != "`":
+                in_quote = None
+                escape = False
+            i += 1
+        else:
+            if is_double_slash and ch == "/" and i + 1 < n and content[i + 1] == "/":
+                i += 2
+                while i < n and content[i] != "\n":
+                    i += 1
+            elif not is_double_slash and ch == comment_char:
+                i += 1
+                while i < n and content[i] != "\n":
+                    i += 1
+            elif ch in quote_chars:
+                in_quote = ch
+                result.append(ch)
+                i += 1
+            else:
+                result.append(ch)
+                i += 1
+
+    return "".join(result)
 
 def audit_test_theatre(repo_root: Path) -> Tuple[bool, List[str]]:
     """
@@ -377,6 +434,7 @@ def audit_test_theatre(repo_root: Path) -> Tuple[bool, List[str]]:
             continue
 
         clean_content = strip_block_comments_and_docstrings(content, code_file.suffix.lower())
+        clean_content = strip_single_line_comments(clean_content, code_file.suffix.lower())
         for harness_pattern in INTEGRATION_HARNESS_PATTERNS:
             if harness_pattern.search(clean_content):
                 has_integration_harness = True
@@ -393,6 +451,7 @@ def audit_test_theatre(repo_root: Path) -> Tuple[bool, List[str]]:
 
         rel_path = test_file.relative_to(repo_root)
         clean_content = strip_block_comments_and_docstrings(content, test_file.suffix.lower())
+        clean_content = strip_single_line_comments(clean_content, test_file.suffix.lower())
 
         # Detect mock frameworks used
         for fw_name, fw_pattern in MOCK_FRAMEWORK_PATTERNS:
@@ -419,7 +478,7 @@ def audit_test_theatre(repo_root: Path) -> Tuple[bool, List[str]]:
         # Tautological assertions check
         for line_no, line in enumerate(clean_content.splitlines(), start=1):
             line_str = line.strip()
-            if line_str.startswith(("#", "//", "/*", "*")):
+            if not line_str or line_str.startswith(("#", "//", "/*", "*")):
                 continue
             for tautology_pat in TAUTOLOGY_PATTERNS:
                 match = tautology_pat.search(line)
@@ -427,6 +486,7 @@ def audit_test_theatre(repo_root: Path) -> Tuple[bool, List[str]]:
                     issues.append(
                         f"{rel_path}:{line_no}: Tautological assertion detected: '{match.group(0).strip()}'"
                     )
+                    break
 
     # Missing integration baseline check across the project
     if mock_frameworks_detected and not has_integration_harness:

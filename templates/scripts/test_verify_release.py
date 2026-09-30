@@ -12,7 +12,7 @@ from pathlib import Path
 # Add scripts directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent))
 
-from verify_release import audit_test_theatre
+from verify_release import audit_test_theatre, strip_single_line_comments
 
 
 class TestVerifyReleaseTestTheatreAudit(unittest.TestCase):
@@ -372,6 +372,104 @@ def test_tautology():
         )
         self.assertEqual(res.returncode, 1, f"Expected 1 exit code, got {res.returncode}. Output:\n{res.stdout}\n{res.stderr}")
         self.assertIn("Tautological assertion detected", res.stdout)
+
+    def test_tautological_assertions_python_boolean_detected(self):
+        """Test detection of Python boolean tautologies like 'assert True' and 'self.assertTrue(True)'."""
+        tests_dir = self.root / "tests"
+        tests_dir.mkdir(parents=True)
+
+        bad_test = tests_dir / "test_bool_tautology.py"
+        bad_test.write_text(
+            """
+import unittest
+
+class BoolTautologyTests(unittest.TestCase):
+    def test_tautologies(self):
+        assert True
+        self.assertTrue(True)
+"""
+        )
+
+        passed, issues = audit_test_theatre(self.root)
+        self.assertFalse(passed)
+        self.assertTrue(
+            any("tautological" in issue.lower() and "assert" in issue and "True" in issue for issue in issues),
+            f"Expected boolean tautology in issues: {issues}"
+        )
+        self.assertTrue(
+            any("tautological" in issue.lower() and "assertTrue" in issue for issue in issues),
+            f"Expected assertTrue tautology in issues: {issues}"
+        )
+
+    def test_commented_out_mock_calls_not_counted(self):
+        """Test that commented-out mock calls in Python and C# are not counted toward mock_count."""
+        tests_dir = self.root / "tests"
+        tests_dir.mkdir(parents=True)
+
+        # Python test file with commented-out mock calls and 1 concrete assertion
+        py_test = tests_dir / "test_comments.py"
+        py_test.write_text(
+            """
+import unittest
+
+class CommentedTests(unittest.TestCase):
+    def test_service(self):
+        # mock_repo.assert_called_with("arg1")
+        # mock_repo.assert_called_once()
+        val = 42 # mock_repo.assert_called_with("arg2")
+        self.assertEqual(val, 42)
+"""
+        )
+
+        # C# test file with commented-out mock calls and 1 concrete assertion
+        cs_test = tests_dir / "CommentedTests.cs"
+        cs_test.write_text(
+            """
+using Xunit;
+
+public class CommentedTests
+{
+    [Fact]
+    public void TestOperation()
+    {
+        // mockRepo.Verify(r => r.Save(), Times.Once());
+        // mockRepo.VerifyAll();
+        var endpoint = "https://example.com/api//v1#heading";
+        Assert.Equal("https://example.com/api//v1#heading", endpoint); // mockRepo.Verify();
+    }
+}
+"""
+        )
+
+        passed, issues = audit_test_theatre(self.root)
+        self.assertTrue(
+            passed,
+            f"Expected commented-out mock calls to be ignored, but got issues: {issues}"
+        )
+
+    def test_strip_single_line_comments_preserves_literals(self):
+        """Test that single-line comment stripping preserves string literals, URLs, and line counts."""
+        py_input = (
+            'url = "https://example.com#heading"\n'
+            '# mock.assert_called_with("hello")\n'
+            'val = 10 // 2 # comment\n'
+        )
+        py_stripped = strip_single_line_comments(py_input, ".py")
+        self.assertIn('"https://example.com#heading"', py_stripped)
+        self.assertNotIn('mock.assert_called_with', py_stripped)
+        self.assertIn('val = 10 // 2', py_stripped)
+        self.assertEqual(len(py_input.splitlines()), len(py_stripped.splitlines()))
+
+        cs_input = (
+            'string url = "https://example.com//api";\n'
+            '// mockRepo.Verify();\n'
+            'var x = 1; // mockRepo.Verify();\n'
+        )
+        cs_stripped = strip_single_line_comments(cs_input, ".cs")
+        self.assertIn('"https://example.com//api"', cs_stripped)
+        self.assertNotIn('mockRepo.Verify', cs_stripped)
+        self.assertIn('var x = 1;', cs_stripped)
+        self.assertEqual(len(cs_input.splitlines()), len(cs_stripped.splitlines()))
 
 
 if __name__ == "__main__":
