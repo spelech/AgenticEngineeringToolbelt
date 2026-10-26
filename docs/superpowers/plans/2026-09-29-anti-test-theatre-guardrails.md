@@ -10,7 +10,7 @@
 
 ## Global Constraints
 
-- Adhere strictly to **ASD-STE100 (Simplified Technical English)** (sentences $\le$ 20-25 words, active voice, imperative mood).
+- Adhere strictly to **ASD-STE100 (Simplified Technical English)** (sentences ≤ 20-25 words, active voice, imperative mood).
 - Use native **Mermaid diagrams** (`flowchart TD`, `flowchart LR`).
 - All file edits must preserve existing comments and docstrings.
 - Conventional Commits enforced (`feat:`, `docs:`, `test:`, `ci:`).
@@ -61,7 +61,7 @@
 - [ ] **Step 1: Expand `standards/TESTING_HARNESS_PATTERNS.md`**
   - Embed the Four Pillars in Section 1.
   - Insert the 12-Dimension Banned vs. Mandated Patterns Matrix.
-  - Document the Deterministic Test Budget Formula: $\text{Nominal} + N_{\text{Branches}} + N_{\text{0-1-N Boundaries}} + N_{\text{Disturbances}}$.
+  - Document the Deterministic Test Budget Formula: `Nominal (1) + N_Branches + N_0-1-N_Boundaries + N_Disturbances`.
   - Document the Deterministic 5-Question Mock Decision Tree with Mermaid diagram.
 
 - [ ] **Step 2: Update `standards/ENGINEERING_STYLE_GUIDE.md`**

@@ -9,14 +9,14 @@ This standard defines the multi-lens code review foci, formal requirement-to-tes
 Single-pass code reviews frequently miss deep architectural, security, or test-theatre defects when a reviewer skims a large diff. Perform code reviews across **six orthogonal reviewer foci**. Each focus evaluates a specific engineering dimension against the diff range (`BASE_SHA..HEAD_SHA`) and requires `file:line` evidence for every finding.
 
 ```mermaid
-flowchart TD
-    Diff["Diff Under Review (BASE_SHA..HEAD_SHA)"] --> F1["Focus 1: Requirement Traceability & Feature Preservation"]
-    Diff --> F2["Focus 2: Architecture, Modularity & Serialization"]
-    Diff --> F3["Focus 3: Anti-Test-Theatre & Live-Executor Isolation"]
-    Diff --> F4["Focus 4: Security, Subprocess & Container Immutability"]
-    Diff --> F5["Focus 5: UI Consistency, Layout Audit & Real Screenshots"]
-    Diff --> F6["Focus 6: Living Docs, Atomic Commits & Release Sync"]
-    F1 & F2 & F3 & F4 & F5 & F6 --> Verdict["Calibrated Review Verdict (Critical / Important / Minor)"]
+flowchart LR
+    Diff["Diff Under Review<br>(BASE_SHA..HEAD_SHA)"] --> F1["Focus 1: Requirement Traceability<br>& Feature Preservation"]
+    Diff --> F2["Focus 2: Architecture, Modularity<br>& Safe Serialization"]
+    Diff --> F3["Focus 3: Anti-Test-Theatre &<br>Live-Executor Isolation"]
+    Diff --> F4["Focus 4: Security, Subprocess &<br>Container Immutability"]
+    Diff --> F5["Focus 5: UI Consistency, Layout<br>Audit & Real Screenshots"]
+    Diff --> F6["Focus 6: Living Docs, Atomic<br>Commits & Release Sync"]
+    F1 & F2 & F3 & F4 & F5 & F6 --> Verdict["Calibrated Review Verdict<br>(Critical / Important / Minor)"]
 ```
 
 ### Focus 1: Requirement Traceability and Feature Preservation

@@ -12,32 +12,15 @@ This document details the standardized 4-stage GitHub Actions CI/CD architecture
 ## Pipeline Topology
 
 ```mermaid
-flowchart LR
-    subgraph Triggers["Git Flow Triggers"]
-        T1["Push to main (Tagged Release)"]
-        T2["Push to develop"]
-        T3["Push to release/*"]
-        T4["PR to develop / main"]
-    end
-
-    subgraph S1["Stage 1: Integrity Gate"]
-        G1["Release & Link Gate<br>• Version sync in manifests<br>• Markdown link & anchor validation<br>• Static anti-test-theatre audit"]
-    end
-
-    subgraph S2["Stage 2: Parallel Builds & Tests"]
-        G2A["Backend Build & Tests<br>• Release build (.slnx / uv)<br>• xUnit / pytest (>= 80% cov)<br>• TRX & coverage artifacts"]
-        G2B["Frontend Quality & Tests<br>• ESLint (0 max warnings)<br>• Production build (Vite)<br>• Vitest & Playwright layout audit"]
-    end
-
-    subgraph S3["Stage 3: Fullstack Smoke Gate"]
-        G3["Live Smoke Integration<br>• Background server spawn<br>• Health probe loop (/health)<br>• Live SSE/HTTP handshake"]
-    end
-
-    subgraph S4["Stage 4: Security, Docs & Release"]
-        G4A["CodeQL Security Analysis"]
-        G4B["VitePress Documentation Deploy<br>(GitHub Pages)"]
-        G4C["Docker Container Publish<br>(GHCR linux/amd64)"]
-    end
+flowchart TD
+    Triggers["Git Flow Triggers<br>• Push to main (Tagged Release)<br>• Push to develop or release/*<br>• PR to develop or main"]
+    G1["Stage 1: Integrity Gate<br>• Version sync in manifests<br>• Markdown link & anchor validation<br>• Static anti-test-theatre audit"]
+    G2A["Stage 2A: Backend Build & Tests<br>• Release build (.slnx / uv)<br>• xUnit / pytest (>= 80% cov)<br>• TRX & coverage artifacts"]
+    G2B["Stage 2B: Frontend Quality & Tests<br>• ESLint (0 max warnings)<br>• Production build (Vite)<br>• Vitest & Playwright layout audit"]
+    G3["Stage 3: Fullstack Smoke Gate<br>• Background server spawn<br>• Health probe loop (/health)<br>• Live SSE/HTTP handshake"]
+    G4A["Stage 4A: CodeQL<br>Security Analysis"]
+    G4B["Stage 4B: VitePress Docs<br>(GitHub Pages)"]
+    G4C["Stage 4C: Docker Publish<br>(GHCR linux/amd64)"]
 
     Triggers --> G1
     G1 --> G2A & G2B

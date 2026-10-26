@@ -5,6 +5,7 @@ export default withMermaid(
   defineConfig({
     title: 'Agentic Engineering Toolbelt',
     description: 'Engineering standards, archetypes, simulation harnesses, and agent rules for high-reliability systems.',
+    srcExclude: ['superpowers/**'],
     base: process.env.GITHUB_ACTIONS ? '/AgenticEngineeringToolbelt/' : '/',
     themeConfig: {
       siteTitle: 'Agentic Engineering Toolbelt',

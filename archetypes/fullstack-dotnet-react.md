@@ -9,10 +9,10 @@
 
 ```mermaid
 flowchart LR
-    A["Conceptual Vision"] --> B["Agent Proactive Questioning & Clarification"]
-    B --> C["Rapid Prototype & Simulation Harness"]
-    C --> D["Closed-Loop Testing & Iterative Learning"]
-    D --> E["Hardened, Extensible & Verified Solution"]
+    A["1. Conceptual<br>Vision"] --> B["2. Proactive<br>Clarification"]
+    B --> C["3. Prototype &<br>Harness"]
+    C --> D["4. Closed-Loop<br>Testing"]
+    D --> E["5. Verified<br>Solution"]
 ```
 
 ### Proactive Clarification and Prototyping

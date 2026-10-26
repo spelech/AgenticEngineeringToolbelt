@@ -12,26 +12,25 @@ This document explains the organization, design principles, consumption topology
 ## System Overview and Consumption Topology
 
 ```mermaid
-flowchart TD
+flowchart LR
     subgraph Toolbelt["AgenticEngineeringToolbelt Repository"]
         Archetypes["archetypes/<br>• 5 Polyglot profiles<br>• Controls, CLI, FastMCP, Vite UI, C++"]
         Standards["standards/<br>• ENGINEERING_STYLE_GUIDE.md<br>• TESTING_HARNESS_PATTERNS.md<br>• CI_CD_PIPELINES.md<br>• CODE_REVIEW_AND_GUARDRAILS.md"]
         Skills[".agents/skills/<br>• engineering-archetype<br>• scaffold-project<br>• test-harness-builder<br>• code-review-foci"]
         Rules["rules/<br>• AGENTS.md (Universal)<br>• GEMINI.md (Antigravity)<br>• CLAUDE.md (Claude Code)"]
-        Templates["templates/<br>• configs/<br>• docs/ (VitePress & Living Specs)<br>• workflows/ (4-stage CI/CD)<br>• scripts/"]
+        Templates["templates/<br>• configs/ & scripts/<br>• docs/ (VitePress & Living Specs)<br>• workflows/ (4-stage CI/CD)"]
     end
 
     subgraph Clients["Consumers & Agentic Runtimes"]
-        Antigravity["Antigravity / Gemini CLI (~/.gemini/skills/)"]
-        Claude["Claude Code (~/.claude/skills/)"]
-        Cursor["Cursor / OpenClaw (.cursorrules)"]
-        Projects["Software Repositories (Git Submodule .toolbelt/)"]
+        Antigravity["Antigravity / Gemini CLI<br>(~/.gemini/skills/)"]
+        Claude["Claude Code<br>(~/.claude/skills/)"]
+        Cursor["Cursor / OpenClaw<br>(.cursorrules)"]
+        Projects["Software Repositories<br>(Git Submodule .toolbelt/)"]
     end
 
     Archetypes & Standards --> Skills & Rules
     Skills --> Antigravity & Claude
     Rules --> Projects & Cursor
-    Standards --> Skills & Rules
     Templates --> Projects
 ```
 
@@ -121,22 +120,12 @@ See the [Git Flow Trigger Matrix](/standards/ci-cd-pipelines#git-flow-trigger-ma
 
 ```mermaid
 flowchart TD
-    subgraph T1["Tier 1: Inner Loop (On Demand)"]
-        Unit["Fast Unit Tests<br>In-memory, isolated domain logic assertions"]
-    end
-    subgraph T2["Tier 2: Stabilization Gate (Pre-Manual)"]
-        Integ["Targeted Integration Tests<br>Boundary contracts & external stubs"]
-    end
-    subgraph T3["Tier 3: Quality Gate (Pre-PR / Pre-Release / CI)"]
-        Matrix["Pairwise & Multi-Provider Matrix"]
-        Sim["Simulation Harnesses & Stress Loops"]
-        E2E["Playwright Layout Inspector & E2E"]
-        Smoke["Fullstack Smoke Gate"]
-    end
+    T1["Tier 1: Inner Loop (On Demand)<br>• Fast in-memory unit tests<br>• Isolated domain logic assertions"]
+    T2["Tier 2: Stabilization Gate (Pre-Manual)<br>• Targeted integration suites<br>• Boundary contracts & external stubs"]
+    T3["Tier 3: Quality Gate (Pre-PR / Pre-Release / CI)<br>• Pairwise & multi-provider matrix<br>• Simulation harnesses & stress loops<br>• Playwright layout audit & fullstack smoke gate"]
 
     T1 -->|Interfaces Stabilize| T2
     T2 -->|Manual Verification Passes| T3
-    Matrix --> Sim --> E2E --> Smoke
 ```
 
 See [Tiered Testing Cadence](/standards/testing-harness-patterns#tiered-testing-cadence) for detailed gate criteria across all three tiers.

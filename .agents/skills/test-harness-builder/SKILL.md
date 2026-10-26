@@ -49,12 +49,12 @@ Test Budget = 1 (Nominal) + N_Branches + N_Boundaries (0-1-N) + N_Disturbances
 
 ```mermaid
 flowchart LR
-    AST["Feature / Function AST"] --> Calc["Compute Test Budget"]
+    AST["Feature /<br>Function AST"] --> Calc["Compute<br>Test Budget"]
     Calc --> T1["Nominal Path (1)"]
     Calc --> T2["Branches & Guards (N)"]
     Calc --> T3["0-1-N Boundaries (1..3)"]
     Calc --> T4["Disturbance / Cancel (1)"]
-    T1 & T2 & T3 & T4 --> CompleteSuite["Exact Deterministic Test Matrix"]
+    T1 & T2 & T3 & T4 --> CompleteSuite["Exact Deterministic<br>Test Matrix"]
 ```
 
 ### Deterministic Five-Question Mock Decision Tree

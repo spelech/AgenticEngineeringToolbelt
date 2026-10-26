@@ -55,7 +55,7 @@ This specification codifies core enhancements to the **Agentic Engineering Toolb
 ### 2.4 ASD-STE100 & Mermaid Documentation Standards
 - **ASD-STE100 (Simplified Technical English)**:
   - Enforced for user-facing documentation, READMEs, architectural overviews, and complex technical concepts.
-  - Sentences must be short and direct ($\le$ 20-25 words).
+  - Sentences must be short and direct (≤ 20-25 words).
   - Use active voice and imperative mood for instructions.
   - Standardize vocabulary; avoid ambiguous jargon, colloquialisms, and redundant synonyms.
   - One instruction or requirement per sentence.

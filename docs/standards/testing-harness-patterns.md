@@ -29,39 +29,13 @@ In fast engineering environments, automated test suites often degrade into **"Te
 The **Four Pillars of Anti-Test Theatre** eliminate test theatre (see also [Ban on Mock-Heavy Test Theatre](/standards/engineering-style-guide#ban-on-mock-heavy-test-theatre)):
 
 ```mermaid
-flowchart TD
-    subgraph P1["Pillar 1: Real Over Mock"]
-        direction TB
-        R1["Real In-Memory DBs<br>(SQLite WAL / Ephemeral Instances)"]
-        R2["Real DI Containers & Service Wiring"]
-        R3["Strict Boundary Isolation<br>(Mocks ONLY at external 3rd-party edge)"]
-    end
+flowchart LR
+    P1["Pillar 1: Real Over Mock<br>• Real In-Memory DBs (SQLite WAL)<br>• Real DI Containers & Service Wiring<br>• Mocks ONLY at 3rd-party edge"]
+    P2["Pillar 2: Outcomes Over Calls<br>• Observable State Deltas (DB, files)<br>• Return Payloads & Invariants<br>• BANNED: Mock.Verify() primary"]
+    P3["Pillar 3: Representative Dogfooding<br>• Full HTTP Pipeline Roundtrips<br>• Real CLI Subprocess Execution<br>• Playwright E2E User Journeys"]
+    P4["Pillar 4: Value Over Vanity<br>• Basis Path & 0-1-N Sweeps<br>• Synthetic Disturbance Injection<br>• BANNED: Trivial POCO coverage"]
 
-    subgraph P2["Pillar 2: Outcomes Over Calls"]
-        direction TB
-        O1["Observable State Deltas (DB rows, files)"]
-        O2["Return Payloads & Invariant Enforcements"]
-        O3["BANNED: Mock.Verify() as primary assertion"]
-    end
-
-    subgraph P3["Pillar 3: Representative Dogfooding"]
-        direction TB
-        D1["Full HTTP Pipeline Roundtrips"]
-        D2["Real CLI Subprocess Execution"]
-        D3["Playwright E2E User Journeys"]
-    end
-
-    subgraph P4["Pillar 4: Value Over Vanity"]
-        direction TB
-        V1["Basis Path & Boundary Sweeps (0-1-N)"]
-        V2["Synthetic Disturbance Ingestion"]
-        V3["BANNED: Testing trivial POCOs for % metrics"]
-    end
-
-    P1 --> RealSystem["Deterministic, High-Confidence Software"]
-    P2 --> RealSystem
-    P3 --> RealSystem
-    P4 --> RealSystem
+    P1 & P2 & P3 & P4 --> RealSystem["Deterministic,<br>High-Confidence<br>Software"]
 ```
 
 #### Pillar 1: Real Implementations Over Synthetic Mocks
@@ -148,12 +122,12 @@ Test Budget = 1 (Nominal) + N_Branches + N_Boundaries (0-1-N) + N_Disturbances
 
 ```mermaid
 flowchart LR
-    AST["Feature / Function AST"] --> Calc["Compute Test Budget"]
+    AST["Feature /<br>Function AST"] --> Calc["Compute<br>Test Budget"]
     Calc --> T1["Nominal Path (1)"]
     Calc --> T2["Branches & Guards (N)"]
     Calc --> T3["0-1-N Boundaries (1..3)"]
     Calc --> T4["Disturbance / Cancel (1)"]
-    T1 & T2 & T3 & T4 --> CompleteSuite["Exact Deterministic Test Matrix"]
+    T1 & T2 & T3 & T4 --> CompleteSuite["Exact Deterministic<br>Test Matrix"]
 ```
 
 ### Deterministic Five-Question Mock Decision Tree
@@ -195,22 +169,12 @@ Running slow integration suites during early exploratory prototyping stalls mome
 
 ```mermaid
 flowchart TD
-    subgraph T1["Tier 1: Inner Loop (On Demand)"]
-        Unit["Fast Unit Tests<br>In-memory, isolated domain logic assertions"]
-    end
-    subgraph T2["Tier 2: Stabilization Gate (Pre-Manual)"]
-        Integ["Targeted Integration Tests<br>Boundary contracts & external stubs"]
-    end
-    subgraph T3["Tier 3: Quality Gate (Pre-PR / Pre-Release / CI)"]
-        Matrix["Pairwise & Multi-Provider Matrix"]
-        Sim["Simulation Harnesses & Stress Loops"]
-        E2E["Playwright Layout Inspector & E2E"]
-        Smoke["Fullstack Smoke Gate"]
-    end
+    T1["Tier 1: Inner Loop (On Demand)<br>• Fast in-memory unit tests<br>• Isolated domain logic assertions"]
+    T2["Tier 2: Stabilization Gate (Pre-Manual)<br>• Targeted integration suites<br>• Boundary contracts & external stubs"]
+    T3["Tier 3: Quality Gate (Pre-PR / Pre-Release / CI)<br>• Pairwise & multi-provider matrix<br>• Simulation harnesses & stress loops<br>• Playwright layout audit & fullstack smoke gate"]
 
     T1 -->|Interfaces Stabilize| T2
     T2 -->|Manual Verification Passes| T3
-    Matrix --> Sim --> E2E --> Smoke
 ```
 
 ### Tier 1: Inner Loop and Rapid Development

@@ -14,7 +14,7 @@
 - APIs First, MCP Later: Domain logic lives in typed, self-contained APIs; MCP tools act strictly as lightweight wrappers.
 - Simulation & Control Harnesses: Observable dynamic systems with diagnostic tap points, parameter sweeps, disturbance injection, and 6-part feedback envelopes for developers and AI.
 - Tiered Testing Cadence: Tier 1 (inner-loop unit tests on demand), Tier 2 (stabilization gate before manual testing), Tier 3 (Pre-PR / Pre-Release / CI quality gate).
-- Living Documentation: ASD-STE100 (Simplified Technical English) rules ($\le$ 20-25 words per sentence, active voice, unambiguous terminology), Mermaid diagrams, and VitePress for GitHub Pages.
+- Living Documentation: ASD-STE100 (Simplified Technical English) rules (≤ 20-25 words per sentence, active voice, unambiguous terminology), Mermaid diagrams, and VitePress for GitHub Pages.
 - Toolbelt verification: Markdown relative links and manifest versions must pass `verify_release.py`.
 - User rules: Run `npm run lint` and `npx tsc --noEmit` after code changes when npm scripts are present.
 

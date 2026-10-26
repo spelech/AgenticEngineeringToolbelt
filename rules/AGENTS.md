@@ -99,39 +99,13 @@ Never write **Test Theatre** (mock-heavy tests that verify method calls instead 
 4. **Pillar 4: Value Over Numeric Vanity**: Prioritize boundary conditions, disturbances, and concurrency over shallow line coverage. Do not write tests for boilerplate POCOs, DTOs, or auto-properties.
 
 ```mermaid
-flowchart TD
-    subgraph P1["Pillar 1: Real Over Mock"]
-        direction TB
-        R1["Real In-Memory DBs<br>(SQLite WAL / Ephemeral)"]
-        R2["Real DI Containers & Service Wiring"]
-        R3["Strict Boundary Isolation<br>(Mocks ONLY at 3rd-party edge)"]
-    end
+flowchart LR
+    P1["Pillar 1: Real Over Mock<br>• Real In-Memory DBs (SQLite WAL)<br>• Real DI Containers & Service Wiring<br>• Mocks ONLY at 3rd-party edge"]
+    P2["Pillar 2: Outcomes Over Calls<br>• Observable State Deltas (DB, files)<br>• Return Payloads & Invariants<br>• BANNED: Mock.Verify() primary"]
+    P3["Pillar 3: Representative Dogfooding<br>• Full HTTP Pipeline Roundtrips<br>• Real CLI Subprocess Execution<br>• Playwright E2E User Journeys"]
+    P4["Pillar 4: Value Over Vanity<br>• Basis Path & 0-1-N Sweeps<br>• Synthetic Disturbance Injection<br>• BANNED: Trivial POCO coverage"]
 
-    subgraph P2["Pillar 2: Outcomes Over Calls"]
-        direction TB
-        O1["Observable State Deltas (DB rows, files)"]
-        O2["Return Payloads & Invariants"]
-        O3["BANNED: Mock.Verify() as primary assertion"]
-    end
-
-    subgraph P3["Pillar 3: Representative Dogfooding"]
-        direction TB
-        D1["Full HTTP Pipeline Roundtrips"]
-        D2["Real CLI Subprocess Execution"]
-        D3["Playwright E2E User Journeys"]
-    end
-
-    subgraph P4["Pillar 4: Value Over Vanity"]
-        direction TB
-        V1["Basis Path & Boundary Sweeps (0-1-N)"]
-        V2["Synthetic Disturbance Ingestion"]
-        V3["BANNED: Testing trivial POCOs for % metrics"]
-    end
-
-    P1 --> RealSystem["Deterministic, High-Confidence Software"]
-    P2 --> RealSystem
-    P3 --> RealSystem
-    P4 --> RealSystem
+    P1 & P2 & P3 & P4 --> RealSystem["Deterministic,<br>High-Confidence<br>Software"]
 ```
 
 ### Deterministic Test Budget Formula
@@ -149,12 +123,12 @@ Test Budget = 1 (Nominal) + N_Branches + N_Boundaries (0-1-N) + N_Disturbances
 
 ```mermaid
 flowchart LR
-    AST["Feature / Function AST"] --> Calc["Compute Test Budget"]
+    AST["Feature /<br>Function AST"] --> Calc["Compute<br>Test Budget"]
     Calc --> T1["Nominal Path (1)"]
     Calc --> T2["Branches & Guards (N)"]
     Calc --> T3["0-1-N Boundaries (1..3)"]
     Calc --> T4["Disturbance / Cancel (1)"]
-    T1 & T2 & T3 & T4 --> CompleteSuite["Exact Deterministic Test Matrix"]
+    T1 & T2 & T3 & T4 --> CompleteSuite["Exact Deterministic<br>Test Matrix"]
 ```
 
 ### Deterministic Five-Question Mock Decision Tree

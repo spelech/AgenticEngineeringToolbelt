@@ -8,10 +8,10 @@ This document codifies the core engineering principles, architectural patterns, 
 
 ```mermaid
 flowchart LR
-    A["Conceptual Vision & Domain Model"] --> B["Agent Clarification & Edge-Case Discovery"]
-    B --> C["Rapid Prototype & Controls Test Harness"]
-    C --> D["Closed-Loop High-Volume Testing & Feedback"]
-    D --> E["Hardened, Extensible & Verified Solution"]
+    A["1. Conceptual<br>Vision"] --> B["2. Proactive<br>Clarification"]
+    B --> C["3. Prototype &<br>Harness"]
+    C --> D["4. Closed-Loop<br>Testing"]
+    D --> E["5. Verified<br>Solution"]
 ```
 
 ### Vision and Proactive Clarification
@@ -111,12 +111,12 @@ gitGraph
 ## Polyglot Language and Archetype Standards
 
 ```mermaid
-flowchart TD
-    Task["Select Project Archetype"]
-    Task -->|High-Performance Systems / Protocols / Control Planes| CSharp["C# (.NET 10)<br>• System.CommandLine + DI<br>• Dapper + Stored Procs (SQL files)<br>• SQLite WAL (MySQL-like) / MSSQL<br>• Native WPF/WinForms/Avalonia (No Electron)"]
-    Task -->|Scrapers / ML / Vision / Data Pipelines / Automation| Python["Python (3.12+)<br>• uv package management<br>• Typer + Pydantic models<br>• FastAPI + FastMCP<br>• asyncio runtime"]
-    Task -->|Web UIs / Layout Analyzers / Interactive Apps| TypeScript["TypeScript / React<br>• Strict TS + Vite<br>• Zustand stores per domain/controller<br>• Pure CSS Modules & CSS variables<br>• Playwright Layout Inspector 4-point audit"]
-    Task -->|Algorithms / Native Systems / High-Compute| Cpp["C++ (C++20/23)<br>• MSBuild (Win) / CMake (Linux)<br>• vcpkg manifest mode<br>• Strict RAII & std::smart_pointers<br>• GoogleTest + ASan/UBSan + Benchmark<br>• C# [LibraryImport] & Python pybind11 interop"]
+flowchart LR
+    Task["Select Project<br>Archetype"]
+    Task -->|Control Planes / Protocols| CSharp["C# (.NET 10)<br>• System.CommandLine + DI<br>• Dapper + Stored Procs (SQL)<br>• SQLite WAL / MSSQL<br>• Native WPF/WinForms/Avalonia"]
+    Task -->|Scrapers / ML / Automation| Python["Python (3.12+)<br>• uv package management<br>• Typer + Pydantic models<br>• FastAPI + FastMCP<br>• asyncio runtime"]
+    Task -->|Web UIs / Interactive Apps| TypeScript["TypeScript / React<br>• Strict TS + Vite<br>• Zustand domain stores<br>• Pure CSS Modules & variables<br>• Playwright 4-point layout audit"]
+    Task -->|Algorithms / High-Compute| Cpp["C++ (C++20/23)<br>• MSBuild (Win) / CMake (Linux)<br>• vcpkg manifest mode<br>• Strict RAII & smart pointers<br>• GoogleTest + ASan/UBSan"]
 ```
 
 ### Curated Archetype Guides
@@ -257,24 +257,16 @@ Write all user-facing documentation, README files, architectural blueprints, and
 ## Four-Stage GitHub Actions CI/CD Pipeline
 
 ```mermaid
-flowchart LR
-    subgraph S1["1. Integrity Gate"]
-        G1["Release Verification<br>(verify_release.py)<br>• Version sync across manifests<br>• Markdown links & section anchors"]
-    end
-    subgraph S2["2. Build & Test Gates"]
-        G2A["Backend Build & Tests<br>xUnit / pytest / gtest (>= 80% cov) & TRX"]
-        G2B["Frontend Build & Tests<br>ESLint 0-warn & Vitest Suite"]
-    end
-    subgraph S3["3. Smoke Gate"]
-        G3["Fullstack Smoke Run<br>Health probe loop & live handshake"]
-    end
-    subgraph S4["4. Analysis & Release"]
-        G4["CodeQL Security Analysis<br>Native Container Publish (linux/amd64)"]
-    end
+flowchart TD
+    G1["1. Integrity Gate<br>verify_release.py: SemVer sync, markdown links & section anchors"]
+    G2A["2A. Backend Build & Tests<br>xUnit / pytest / gtest (>= 80% cov) & TRX"]
+    G2B["2B. Frontend Build & Tests<br>ESLint 0-warn & Vitest Suite"]
+    G3["3. Fullstack Smoke Gate<br>Health probe loop & live handshake"]
+    G4["4. Analysis & Release<br>CodeQL Security Analysis & Native Container Publish (linux/amd64)"]
 
-    S1 --> S2
-    S2 --> S3
-    S3 --> S4
+    G1 --> G2A & G2B
+    G2A & G2B --> G3
+    G3 --> G4
 ```
 
 See the [Multi-Stage CI/CD Pipeline Blueprint](CI_CD_PIPELINES.md) for complete trigger rules and stage definitions.
