@@ -1,10 +1,10 @@
-# 🚀 Multi-Stage GitHub Actions CI/CD Pipeline Blueprint
+# Multi-Stage GitHub Actions CI/CD Pipeline Blueprint
 
-This document details the standardized 4-stage GitHub Actions CI/CD architecture deployed across projects. It codifies Git Flow triggers, quality gates, and automated living documentation deployment.
+This document details the standardized 4-stage GitHub Actions CI/CD architecture deployed across projects. It codifies [Traditional Git Flow](ENGINEERING_STYLE_GUIDE.md#traditional-git-flow-discipline) triggers, quality gates, and automated living documentation deployment.
 
 ---
 
-## 🏛️ Pipeline Topology
+## Pipeline Topology
 
 ```mermaid
 flowchart LR
@@ -16,11 +16,11 @@ flowchart LR
     end
 
     subgraph S1["Stage 1: Integrity Gate"]
-        G1["Release & Link Gate<br>• Version sync in manifests<br>• Markdown relative link validation<br>• ASD-STE100 & GFM anchors"]
+        G1["Release & Link Gate<br>• Version sync in manifests<br>• Markdown link & anchor validation<br>• Static anti-test-theatre audit"]
     end
 
     subgraph S2["Stage 2: Parallel Builds & Tests"]
-        G2A["Backend Build & Tests<br>• Release build (.slnx / uv)<br>• xUnit / pytest (>80% cov)<br>• TRX & coverage artifacts"]
+        G2A["Backend Build & Tests<br>• Release build (.slnx / uv)<br>• xUnit / pytest (>= 80% cov)<br>• TRX & coverage artifacts"]
         G2B["Frontend Quality & Tests<br>• ESLint (0 max warnings)<br>• Production build (Vite)<br>• Vitest & Playwright layout audit"]
     end
 
@@ -42,7 +42,7 @@ flowchart LR
 
 ---
 
-## 🚦 1. Git Flow Trigger Matrix
+## Git Flow Trigger Matrix
 
 The pipeline adapts execution stages based on the Git Flow branch and lifecycle event:
 
@@ -56,38 +56,43 @@ The pipeline adapts execution stages based on the Git Flow branch and lifecycle 
 
 ---
 
-## 📋 2. Stage Descriptions
+## Stage Descriptions
 
-### Stage 1: Release & Link Integrity Gate
-Runs `scripts/verify_release.py` to ensure that:
-- Version numbers match across all manifest files (`.csproj`, `package.json`, `pyproject.toml`, `CHANGELOG.md`).
-- All relative markdown links and anchor targets resolve to existing files and valid headings.
-- Documentation adheres to standard directory structure and file conventions.
+### Stage 1: Release and Link Integrity Gate
 
-### Stage 2: Parallel Builds & Tests
+Runs `templates/scripts/verify_release.py` to verify that:
+- Version numbers match across all manifest files (`.csproj`, `package.json`, `pyproject.toml`, and `CHANGELOG.md`).
+- All relative markdown links and `#section` anchor targets resolve to existing files and valid headings.
+- Documentation contains zero unrendered LaTeX math sequences (`$\ge$`, `$\le$`, `$$...$$`).
+- Test suites pass the static anti-test-theatre audit (see [Tier 3 Quality Gate](TESTING_HARNESS_PATTERNS.md#tier-3-pre-pr-pre-release-and-ci-quality-gate)).
+
+### Stage 2: Parallel Builds and Tests
+
 - **Backend**:
-  - Restores dependencies and builds in Release configuration.
-  - Executes unit and integration test suites with code coverage collection ($\ge$ 80% coverage required).
+  - Restores dependencies and compiles in `Release` configuration.
+  - Executes unit and integration test suites with code coverage collection (**≥ 80% coverage** required).
   - Uploads TRX test result files and code coverage summaries.
 - **Frontend**:
-  - Installs dependencies using clean install (`npm ci`).
+  - Installs dependencies cleanly via `npm ci`.
   - Runs ESLint with zero-warning tolerance (`--max-warnings 0`).
   - Compiles production assets via `vite build`.
-  - Runs Vitest unit suites and Playwright layout inspector audits.
+  - Executes Vitest unit suites and [Playwright Layout Inspector Audits](TESTING_HARNESS_PATTERNS.md#ui-layout-stability-and-ergonomics-auditing).
 
 ### Stage 3: Fullstack Integration Smoke Gate
+
 - Spawns compiled backend and frontend services in the background.
 - Polls the `/health` endpoint until a healthy response returns within timeout limits.
-- Executes real HTTP and SSE communication handshakes.
+- Executes real HTTP and Server-Sent Events (SSE) communication handshakes.
 - Terminates background processes cleanly and verifies zero orphan processes.
 
-### Stage 4: Security, Documentation & Release
-- **CodeQL Security Analysis**: Runs multi-language static code analysis across C#, Python, and TypeScript to detect vulnerabilities.
+### Stage 4: Security, Documentation, and Release
+
+- **CodeQL Security Analysis**: Runs multi-language static analysis across C#, Python, and TypeScript to detect vulnerabilities.
 - **VitePress Living Documentation Deployment**:
   - Builds the static documentation site using `npx vitepress build docs`.
   - Renders native Mermaid diagrams into accessible SVG assets.
-  - Publishes static assets directly to GitHub Pages on verified release tags and `main` updates.
+  - Publishes static assets to GitHub Pages on verified release tags and `main` branch updates.
 - **Docker Container Publish**:
   - Builds native `linux/amd64` container images without emulation overhead.
-  - Authenticates and pushes multi-stage container images to GitHub Container Registry (GHCR).
+  - Pushes multi-stage container images to GitHub Container Registry (GHCR).
   - Attaches release tags matching repository SemVer (`ghcr.io/org/repo:vX.Y.Z` and `:latest`).

@@ -8,6 +8,13 @@ export default withMermaid(
     base: process.env.GITHUB_ACTIONS ? `/${process.env.GITHUB_REPOSITORY?.split('/')[1] || ''}/` : '/',
     themeConfig: {
       siteTitle: 'Project Docs',
+      outline: {
+        level: [2, 3],
+        label: 'On this page'
+      },
+      search: {
+        provider: 'local'
+      },
       nav: [
         { text: 'Home', link: '/' },
         { text: 'Architecture', link: '/architecture' },
@@ -16,6 +23,7 @@ export default withMermaid(
       sidebar: [
         {
           text: 'Architecture & Design',
+          collapsed: false,
           items: [
             { text: 'System Overview', link: '/architecture' },
             { text: 'System Requirements', link: '/requirements' },
@@ -24,6 +32,7 @@ export default withMermaid(
         },
         {
           text: 'Standards & Quality',
+          collapsed: false,
           items: [
             { text: 'Style Guide & Conventions', link: '/standards/style-guide' },
             { text: 'Simulation & Control Harnesses', link: '/standards/simulation-harnesses' }

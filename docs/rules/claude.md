@@ -3,23 +3,43 @@ title: "Claude Code Guidelines (CLAUDE.md)"
 description: "Claude Code runtime guidelines, command rules, and verification standards."
 ---
 
-# 🤖 Claude Code Agent Configuration
+# Claude Code Agent Configuration (CLAUDE.md)
 
-This repository adheres to the architecture, coding standards, test harness conventions, and CI/CD quality gates codified in `AgenticEngineeringToolbelt`.
+This repository adheres to the architecture, coding standards, test harness conventions, and CI/CD quality gates codified in **AgenticEngineeringToolbelt**.
 
-## 📌 Master Rules Reference
-Always follow all guidelines in [**AGENTS.md**](/rules/agents), [**ENGINEERING_STYLE_GUIDE.md**](/standards/engineering-style-guide), and [**TESTING_HARNESS_PATTERNS.md**](/standards/testing-harness-patterns).
+---
 
-## ⚡ Active Skills
-- `engineering-archetype`: Master architectural standards across C#, Python, TS, and C++.
-- `scaffold-project`: Scaffolds projects adhering to traditional Git Flow, living documentation, and 4-stage CI/CD.
-- `test-harness-builder`: Builds closed-loop simulation harnesses, tap points, Playwright UI drivers, and 6-part feedback envelopes.
+## Master Rules Reference
 
-## 🎯 Core Execution Tenets
-1. **Traditional Git Flow**: Work in `feature/*` branches off `develop`. Release through `release/*` branches to `main` with tags and back to `develop`. Urgent fixes flow through `hotfix/*` off `main`.
-2. **APIs First, MCP Later**: Keep domain logic inside typed, standalone libraries and REST APIs. Expose MCP tools strictly as thin wrappers.
-3. **Simulation & Control Harnesses**: Treat software as an observable dynamic system. Build diagnostic tap points, stress loops, disturbance injection, and 6-part feedback envelopes.
-4. **Tiered Testing Cadence**: Tier 1 (inner loop on demand), Tier 2 (stabilization gate before manual testing), Tier 3 (full matrix, harness sweeps, and Playwright audits before PR/release).
-5. **Living Documentation & ASD-STE100**: Apply ASD-STE100 rules ($\le$ 20-25 words per sentence, active voice, imperative mood). Embed native Mermaid diagrams. Publish via VitePress.
-6. **Anti-Test Theatre & Representative Verification**: Test with real implementations like SQLite WAL, real DI, and full HTTP roundtrips. Never mock internal interfaces or repositories. Never use `mock.Verify()` as the primary assertion. Compute test budgets deterministically ($1 + \text{Branches} + \text{Boundaries} + \text{Disturbances}$). Follow the 5-Question Mock Decision Tree in [**AGENTS.md**](/rules/agents) and [**TESTING_HARNESS_PATTERNS.md**](/standards/testing-harness-patterns).
+Always follow the complete guidelines in:
+- [**Universal Agent Rules (`AGENTS.md`)**](/rules/agents)
+- [**Master Engineering Style Guide**](/standards/engineering-style-guide)
+- [**Simulation and Control Harnesses**](/standards/testing-harness-patterns)
 
+---
+
+## Active Skills
+
+- [**`engineering-archetype`**](/rules/skills#engineering-archetype-skill): Enforces master architectural standards across C#, Python, TypeScript, and C++.
+- [**`scaffold-project`**](/rules/skills#scaffold-project-skill): Scaffolds projects adhering to traditional Git Flow, living documentation, and 4-stage CI/CD.
+- [**`test-harness-builder`**](/rules/skills#test-harness-builder-skill): Builds closed-loop simulation harnesses, diagnostic tap points, Playwright UI drivers, and 6-part feedback envelopes.
+
+---
+
+## Core Execution Tenets
+
+### Workflow and Architecture Tenets
+
+1. **Traditional Git Flow**: Work in `feature/*` branches off `develop`. Release through `release/*` branches to `main` with SemVer tags and sync back to `develop`. Route urgent fixes through `hotfix/*` off `main` (see [Traditional Git Flow Discipline](/standards/engineering-style-guide#traditional-git-flow-discipline)).
+2. **APIs First, MCP Later**: Keep domain logic inside typed, standalone libraries and REST APIs. Expose Model Context Protocol (MCP) tools strictly as thin wrappers (see [APIs First, MCP Later](/standards/engineering-style-guide#apis-first-mcp-later)).
+3. **Living Documentation Standards**: Apply [Technical Writing Standards](/standards/asd-ste100) (≤ 25 words per sentence, active voice, imperative mood, section-scoped cross-links). Embed native Mermaid diagrams and publish via VitePress.
+
+### Verification and Anti-Test Theatre Tenets
+
+1. **Simulation and Control Harnesses**: Treat software as an observable dynamic system with [Diagnostic Tap Points](/standards/testing-harness-patterns#diagnostic-tap-points-and-agent-introspection), stress loops, disturbance injection, and [Six-Part Agent Feedback Envelopes](/standards/testing-harness-patterns#the-six-part-agent-feedback-envelope).
+2. **Tiered Testing Cadence**: Follow the [Tiered Testing Cadence](/standards/testing-harness-patterns#tiered-testing-cadence) across Tier 1 (inner loop on demand), Tier 2 (stabilization gate before manual testing), and Tier 3 (full matrix, harness sweeps, and Playwright audits before PR or release).
+3. **Anti-Test Theatre and Deterministic Protocols**:
+   - Test with real implementations (SQLite WAL, real DI, and full HTTP roundtrips) per the [Four Pillars of Anti-Test Theatre](/standards/testing-harness-patterns#the-four-pillars-of-anti-test-theatre).
+   - Never mock internal interfaces or repositories, and never use `mock.Verify()` as a primary assertion.
+   - Compute required test suite size using the [Deterministic Test Budget Formula](/standards/testing-harness-patterns#deterministic-test-budget-formula) (`1 + Branches + Boundaries + Disturbances`).
+   - Evaluate every dependency with the [Deterministic Five-Question Mock Decision Tree](/standards/testing-harness-patterns#deterministic-five-question-mock-decision-tree).

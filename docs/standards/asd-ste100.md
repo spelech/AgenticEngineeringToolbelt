@@ -1,27 +1,34 @@
 ---
-title: ASD-STE100 Simplified Technical English Guide
-description: Writing rules, vocabulary constraints, and clarity standards for living technical documentation.
+title: "Technical Writing Standards"
+description: "ASD-STE100 and Google Developer Documentation Style Guide rules for clear, scannable, and deterministic technical documentation."
 ---
 
-# 📖 ASD-STE100 Simplified Technical English Guide
+# Technical Writing Standards: ASD-STE100 and Google Developer Style
 
-This document defines technical writing standards for the **AgenticEngineeringToolbelt**. All documentation, architecture guides, and code comments must follow these rules.
-
----
-
-## 🎯 Purpose and Objectives
-
-ASD-STE100 reduces language complexity. It improves readability for human engineers and artificial intelligence agents.
-
-Key objectives:
-- Eliminate linguistic ambiguity in specifications.
-- Ensure consistent technical terminology across polyglot repositories.
-- Facilitate high-speed semantic parsing by large language models.
-- Prevent misinterpretation during automated code generation.
+This guide defines the technical writing, structural, and formatting standards for **AgenticEngineeringToolbelt** and all downstream projects (see [Living Documentation and Automation](/standards/engineering-style-guide#living-documentation-and-automation)).
 
 ---
 
-## 📐 Core Writing Rules
+## Purpose and Style Foundations
+
+### ASD-STE100 Simplified Technical English
+
+ASD-STE100 reduces linguistic complexity so both human engineers and autonomous AI agents can parse specifications without ambiguity:
+- Keep procedural sentences under **25 words**.
+- Restrict each term to a single, unambiguous technical meaning.
+- Express one instruction or requirement per sentence.
+
+### Google Developer Documentation Style Guide
+
+Google Developer Documentation conventions ensure scannable structure, accessible navigation, and reliable cross-linking:
+- Address the reader in the second person (**"you"**) or use imperative verbs.
+- Organize dense topics into hierarchical `H2` (`##`) and `H3` (`###`) headings for left-rail and right-rail navigation.
+- Write descriptive link text that targets a single specific section anchor (`#section-slug`) rather than linking across multiple headers.
+- Avoid leading numbers, ampersands (`&`), or emojis in section headings so Markdown anchor slugs resolve identically across VitePress and GitHub.
+
+---
+
+## Core Writing Rules
 
 ```mermaid
 flowchart TD
@@ -29,19 +36,21 @@ flowchart TD
     Voice --> Terms["3. One Word, One Meaning"]
     Terms --> Verbs["4. Specific Action Verbs"]
     Verbs --> Nouns["5. Short Noun Clusters (<= 3 nouns)"]
-    Nouns --> Lists["6. Sequential Numbered Lists"]
-    Lists --> Diagrams["7. Mermaid Visual Diagrams"]
+    Nouns --> Structure["6. Scannable Headings, Lists & Tables"]
+    Structure --> Links["7. Section-Scoped Cross-Links & Diagrams"]
 ```
 
 ### Rule 1: Keep Sentences Short
-- Keep sentences to a maximum of **20 to 25 words**.
+
+- Limit sentences to **20 to 25 words**.
 - Express only **one complete thought** per sentence.
-- Split compound sentences that use multiple conjunctions.
+- Split compound sentences into bulleted lists or sequential steps.
 
 ### Rule 2: Use Active Voice and Imperative Mood
-- State who or what performs the action.
-- Use imperative mood for procedural instructions and guidelines.
-- Do not use passive voice constructions.
+
+- State clearly who or what performs the action.
+- Begin procedural instructions with an imperative verb.
+- Avoid passive voice constructions.
 
 | Passive Form (Do Not Use) | Active / Imperative Form (Approved) |
 | :--- | :--- |
@@ -50,54 +59,75 @@ flowchart TD
 | The ring buffer is read by the simulation harness. | The simulation harness reads the ring buffer. |
 
 ### Rule 3: One Word for One Meaning
-- Select one approved technical term and use it consistently.
-- Do not alternate between synonyms to vary writing style.
-- Keep naming identical across code, configurations, and documentation.
 
-| Inconsistent Synonyms (Do Not Use) | Standard Term (Approved) |
+- Select one canonical technical term and use it consistently.
+- Do not alternate between synonyms to vary writing style.
+- Match documentation terms to codebase class and interface names.
+
+| Inconsistent Synonyms (Do Not Use) | Canonical Term (Approved) |
 | :--- | :--- |
 | harness / test loop / runner / driver | **Simulation Harness** |
 | endpoint / action / route / path | **API Route** |
 | tap point / hook / probe / monitor | **Diagnostic Tap Point** |
 
 ### Rule 4: Eliminate Vague Verbs
-- Do not use generic verbs like *make*, *do*, *get*, or *perform*.
-- Use precise verbs that describe the exact system operation.
 
-| Vague Verb | Precise Replacement |
+- Do not use generic verbs such as *make*, *do*, *get*, or *deal with*.
+- Choose precise verbs that describe the exact system operation.
+
+| Vague Phrase (Do Not Use) | Precise Replacement (Approved) |
 | :--- | :--- |
 | Make a new connection to SQL | Connect to the SQL server |
 | Do a check on input parameters | Validate all input parameters |
-| Get data from cache | Retrieve records from Redis cache |
+| Get data from cache | Retrieve records from the cache |
 | Deal with error conditions | Handle timeout exceptions |
 
 ### Rule 5: Limit Noun Clusters
+
 - Do not string more than **three consecutive nouns** together.
 - Use prepositions to clarify relationships between components.
 
-| Complex Noun Cluster | Clarified Phrase |
+| Dense Noun Cluster (Do Not Use) | Clarified Phrase (Approved) |
 | :--- | :--- |
 | order processing queue worker thread | worker thread for the order processing queue |
 | client state event listener registry | registry of event listeners for client state |
 
-### Rule 6: Use Structured Lists for Steps
-- Use **numbered lists** for sequential procedures.
-- Use **bulleted lists** for unordered catalog items or requirements.
-- Begin each list item with a capital letter and an imperative verb.
+---
 
-### Rule 7: Complement Text with Diagrams
-- Always accompany complex architectural descriptions with **Mermaid diagrams**.
-- Use `flowchart TD` or `flowchart LR` for system topology.
-- Use `sequenceDiagram` for distributed request lifecycles.
-- Use `stateDiagram-v2` for finite state machines and lifecycle transitions.
+## Structural and Formatting Rules
+
+### Scannable Headings and Lists
+
+- Break dense paragraphs and long tables into focused `H2` (`##`) and `H3` (`###`) subsections so every topic appears in the right-side "On this page" outline.
+- Use **numbered lists** for sequential procedures.
+- Use **bulleted lists** or **tables** for unordered options, rules, and comparisons.
+- Write headings using plain words (`and` instead of `&`, no leading emojis or numbers) to produce clean, deterministic anchor slugs.
+
+### Section-Scoped Cross-Linking
+
+- Link directly to the specific target section (`[Five-Question Mock Decision Tree](/standards/testing-harness-patterns#deterministic-five-question-mock-decision-tree)`) instead of linking only to the top of a multi-section document.
+- Never combine topics from separate headers into a single ambiguous link. Give each referenced topic its own descriptive link and section anchor.
+
+### Numeric Symbols and Formula Formatting
+
+- Do not use raw LaTeX math delimiters (`$...$`, `$$...$$`, `\ge`, `\le`, `\text{...}`) in Markdown prose or tables, as standard Markdown and VitePress render them as literal text unless a math compiler is active.
+- Use standard Unicode symbols (**`≥`**, **`≤`**) or clear English phrases (*"at least 80%"*, *"500 lines or fewer"*) in body text and tables.
+- Format multi-term equations inside fenced `text` code blocks or bold inline expressions:
+  `Test Budget = 1 (Nominal) + N_Branches + N_Boundaries (0-1-N) + N_Disturbances`
+
+### Mermaid Visual Diagrams
+
+- Accompany complex topologies, state machines, and workflows with native **Mermaid diagrams** (`flowchart TD`, `flowchart LR`, `sequenceDiagram autonumber`, `stateDiagram-v2`, `gitGraph`).
+- Do not place HTML entities (`&ge;`, `&lt;`, `&gt;`) inside Mermaid node labels; use plain ASCII (`>=`, `<=`) or Unicode (`≥`, `≤`).
 
 ---
 
-## 📋 Verification Checklist
+## Verification Checklist
 
-Before publishing documentation, verify:
+Verify the following criteria before opening a Pull Request:
 - [ ] Every sentence contains 25 words or fewer.
-- [ ] All procedures use active, imperative verbs.
-- [ ] Technical terms match canonical codebase names exactly.
-- [ ] Architectural sections include valid Mermaid diagrams.
-- [ ] Relative markdown links resolve cleanly.
+- [ ] All procedural steps use active, imperative verbs.
+- [ ] Dense sections are decomposed into `H2` and `H3` headings visible in right-side navigation.
+- [ ] Cross-links use descriptive text and resolve to exact `#section` anchors.
+- [ ] Zero raw LaTeX delimiters (`$\ge$`, `$\le$`, `$$`) or broken HTML entities exist in prose or diagrams.
+- [ ] `python3 templates/scripts/verify_release.py --ci` passes with zero broken links or anchors.
