@@ -14,7 +14,7 @@ This specification codifies comprehensive **Anti-Test-Theatre Guardrails** acros
 ### The Problem: Test Theatre in AI-Assisted and Modern Engineering
 In AI-assisted and fast-paced development environments, automated test suites often degrade into **"Test Theatre"**:
 - **Mock-Heavy Tautologies**: Agents construct elaborate mocks of internal domain interfaces. Tests verify that mocks were invoked rather than asserting that system state mutated correctly.
-- **Coverage Chasing Without Representation**: Suites achieve $\ge$ 80% line coverage by asserting trivial constructors, property getters/setters, and superficial happy paths while missing real-world boundary failures.
+- **Coverage Chasing Without Representation**: Suites achieve ≥ 80% line coverage by asserting trivial constructors, property getters/setters, and superficial happy paths while missing real-world boundary failures.
 - **Fragile Scaffolding vs. Real Deficiencies**: Tests break whenever implementation details refactor, yet fail to catch critical regressions that developers discover immediately upon dogfooding.
 
 ### The Solution: Observable Systems & Representative Verification
@@ -97,7 +97,7 @@ flowchart TD
 | **7. Error Handling & Fault Injection** | • Writing happy-path-only tests where errors are never simulated.<br>• Testing exception handling by forcing a mock to throw an exception that the real system would never produce (e.g. mock throws generic `Exception` instead of realistic socket timeout). | • Inject synthetic disturbances: malformed JSON payloads, abrupt process termination (`mock_stdio.js`), socket timeouts, and invalid auth tokens.<br>• Verify graceful degradation, standardized error payloads, and audit log generation. |
 | **8. Test Data & Fixtures** | • Randomly generated, uncontrolled test data that produces non-deterministic flaky failures.<br>• Massive, fragile 1,000-line JSON fixtures with 90% unused data copied across test files. | • Use deterministic, minimal test data builders / factories with explicit random seeds.<br>• Only specify fields relevant to the specific test scenario; use sensible, valid domain defaults for the rest. |
 | **9. Trivial & Boilerplate Testing** | • Testing auto-implemented properties, C# record constructors, DTO getters/setters, or enum conversions purely to boost line coverage.<br>• Writing 20 tests for a 1-line pass-through function. | • Do not write tests for boilerplate POCOs, DTOs, or auto-properties.<br>• Focus testing budgets strictly on domain logic, calculation rules, edge cases, state transitions, and integration boundaries. |
-| **10. UI & Frontend Verification** | • Shallow unit testing of React components using Jest/Vitest where every sub-component and hook is mocked to an empty `<div>`.<br>• Snapshot testing massive DOM trees that developers blindly update (`-u`) when they break. | • Run Playwright E2E journey tests against the real running frontend and backend.<br>• Enforce the 4-point `playwright-layout-inspector` audit (zero layout overflow, mobile fit, $\ge$ 24px touch targets, layout score $\ge$ 85). |
+| **10. UI & Frontend Verification** | • Shallow unit testing of React components using Jest/Vitest where every sub-component and hook is mocked to an empty `<div>`.<br>• Snapshot testing massive DOM trees that developers blindly update (`-u`) when they break. | • Run Playwright E2E journey tests against the real running frontend and backend.<br>• Enforce the 4-point `playwright-layout-inspector` audit (zero layout overflow, mobile fit, ≥ 24px touch targets, layout score ≥ 85). |
 | **11. Configuration & Environments** | • Hardcoding environment variables or mocking `IConfiguration` with fake dictionary Lookups in memory.<br>• Tests that only pass on the author's local machine because they depend on local file paths. | • Test configuration binding using real appsettings/`.env` loading with temporary isolated environment overlays.<br>• Verify fallback behavior when required configuration keys are absent or invalid. |
 | **12. Third-Party Network Boundaries** | • Mocking third-party APIs by hand-rolling complex mock behaviors that drift away from real API contracts.<br>• Letting tests make real outbound network requests to live third-party services. | • Use WireMock (.NET) or `respx` / `vcrpy` (Python) to replay recorded HTTP interactions or strictly validate request contracts.<br>• Restrict mocking strictly to external network edges; never use mocks for internal service boundaries. |
 
@@ -110,15 +110,17 @@ To eliminate guesswork and subjective choices, agents follow two mechanical algo
 ### 4.1 Deterministic Test Budget Formula
 Agents analyze the function or feature Abstract Syntax Tree (AST) to compute the exact required test suite budget:
 
-$$\text{Test Budget} = \text{Nominal (1)} + N_{\text{Decision Branches}} + N_{\text{0-1-N Boundaries}} + N_{\text{Disturbances}}$$
+```text
+Test Budget = Nominal (1) + N_Decision_Branches + N_0-1-N_Boundaries + N_Disturbances
+```
 
-1. **Nominal Path ($= 1$)**: Exactly one test exercising the happy path with valid nominal data.
-2. **Decision & Guard Branches ($= N_{\text{branches}}$)**: Exactly one test per independent branch (`if`, `switch`, validation guard, explicit `throw`).
-3. **0-1-N Boundary Conditions ($= 1 \text{ to } 3$)**:
+1. **Nominal Path (`= 1`)**: Exactly one test exercising the happy path with valid nominal data.
+2. **Decision & Guard Branches (`= N_branches`)**: Exactly one test per independent branch (`if`, `switch`, validation guard, explicit `throw`).
+3. **0-1-N Boundary Conditions (`= 1 to 3`)**:
    - `0`: Empty collection, null parameter, or zero value.
    - `1`: Single element or minimum boundary threshold.
    - `N`: Large collection, maximum boundary, or page limit.
-4. **Disturbances / Lifecycle ($= 1$ if async or I/O)**:
+4. **Disturbances / Lifecycle (`= 1` if async or I/O)**:
    - For async methods: exactly one test validating cancellation token propagation or timeout recovery.
    - For state mutations: exactly one test validating idempotency.
 
@@ -147,7 +149,7 @@ flowchart TD
     Q3 -- Yes --> UseTime["USE TIME ABSTRACTION<br/>(TimeProvider / time-machine)"]
     Q3 -- No --> Q4{"Is it an external 3rd-party<br/>HTTP API (e.g. Stripe)?"}
     
-    Q4 -- Yes --> UseWireMock["USE CONTRACT STUB<br/>(WireMock.Net / respx)<br/>NEVER Mock&lt;T&gt; interfaces!"]
+    Q4 -- Yes --> UseWireMock["USE CONTRACT STUB<br/>(WireMock.Net / respx)<br/>NEVER Mock of T interfaces!"]
     Q4 -- No --> Q5{"Is it child process<br/>STDIO or OS Pipe?"}
     
     Q5 -- Yes --> UseSynth["USE SYNTHETIC TRANSPORT<br/>(mock_stdio.js with fault injection)"]

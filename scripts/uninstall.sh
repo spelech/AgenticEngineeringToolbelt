@@ -4,7 +4,7 @@ set -e
 # AgenticEngineeringToolbelt uninstaller / unlink script
 echo "🧹 Unlinking AgenticEngineeringToolbelt skills from agent directories..."
 
-SKILLS=("engineering-archetype" "scaffold-project" "test-harness-builder")
+SKILLS=("engineering-archetype" "scaffold-project" "test-harness-builder" "code-review-foci")
 
 # 1. Antigravity / Gemini CLI
 GEMINI_SKILLS_DIR="$HOME/.gemini/antigravity-cli/skills"

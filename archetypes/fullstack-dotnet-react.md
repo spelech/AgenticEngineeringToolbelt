@@ -1,91 +1,109 @@
-# 🏛️ Archetype: Fullstack (.NET + React + SQL) with Simulation & Control Harness
+# Archetype: Fullstack (.NET + React + SQL) with Simulation and Control Harness
 
 > **Architect**: Steven T. Pelech  
 > **Focus**: Controls engineering, simulation, deterministic high-concurrency systems, and closed-loop testing for developers and AI.
 
 ---
 
-## 🤝 1. Collaboration & Iterative Design Model
+## Collaboration and Iterative Design Model
 
 ```mermaid
 flowchart LR
-    A["💡 Vision in Steven's Head"] --> B["❓ Agent Proactive Questioning & Clarification"]
-    B --> C["📐 Rapid Prototype & Simulation Harness"]
-    C --> D["🔄 Closed-Loop Testing & Iterative Learning"]
-    D --> E["✨ Hardened, Extensible & Verified Solution"]
+    A["1. Conceptual<br>Vision"] --> B["2. Proactive<br>Clarification"]
+    B --> C["3. Prototype &<br>Harness"]
+    C --> D["4. Closed-Loop<br>Testing"]
+    D --> E["5. Verified<br>Solution"]
 ```
 
-- **Vision & Exploration**: Steven drives the conceptual vision, architecture, and feature ideas. Because ideas start in his head and evolve, **part of the agent's primary job is to ask insightful clarifying questions** to flesh out requirements, edge cases, and design constraints before or during development.
-- **Iterative Prototyping**: We build via rapid prototyping and closed-loop evaluation—prototyping early, running simulation harnesses, learning from live behavior, and refining architecture iteratively.
-- **Traditional Git Flow Workflow**:
-  - The repository adheres strictly to traditional Git Flow:
-    - `main`: Production releases with immutable SemVer tags (`vX.Y.Z`).
-    - `develop`: Primary integration branch for verified feature work.
-    - `release/*`: Release stabilization branches branched from `develop`, merged into both `main` and `develop`.
-    - `feature/*`: Feature branches branched from `develop`, merged back into `develop` via PR.
-    - `hotfix/*`: Emergency production fixes branched from `main`, merged into both `main` and `develop`.
-  - All new features and significant plans start on a **fresh `feature/*` branch** off `develop`.
-  - Work is committed with **fine-grained, atomic commits** to keep history transparent and legible.
-  - Features culminate in a **Pull Request (PR)** where all multi-stage CI quality gates must pass before merging.
+### Proactive Clarification and Prototyping
+
+- **Vision and Exploration**: Steven drives the conceptual vision, architecture, and feature ideas. Because ideas evolve during design, **the agent must ask insightful clarifying questions** to define requirements, edge cases, and design constraints.
+- **Iterative Prototyping**: Build via rapid prototyping and closed-loop evaluation. Prototype early, run simulation harnesses, learn from live behavior, and refine the architecture iteratively.
+
+### Traditional Git Flow Workflow
+
+Follow [Traditional Git Flow Discipline](../standards/ENGINEERING_STYLE_GUIDE.md#traditional-git-flow-discipline):
+- **`main`**: Production releases with immutable SemVer tags (`vX.Y.Z`).
+- **`develop`**: Primary integration branch for verified feature work.
+- **`feature/*`**: Feature branches branched from `develop` and merged back via Pull Request.
+- **`release/*`**: Release stabilization branches branched from `develop` and merged into both `main` and `develop`.
+- **`hotfix/*`**: Emergency production fixes branched from `main` and merged into both `main` and `develop`.
+
+Create fine-grained, atomic Conventional Commits on each `feature/*` branch and verify that all [Multi-Stage CI/CD Pipeline](../standards/CI_CD_PIPELINES.md#git-flow-trigger-matrix) gates pass before merging.
 
 ---
 
-## 🎯 2. The 12 Core Tenets
+## Core Architectural Tenets
 
-1. **Division of Labor & Proactive Questioning**: Agent asks clarifying questions to flesh out requirements; iterative prototyping with fast feedback loops.
-2. **Controls, Modeling & Simulation Mindset**: Systems gravitate towards rich simulation and control test harnesses, observable dynamic systems, diagnostic tap points (in-memory ring buffers, diagnostic hooks), simulated environments (mock transports like `mock_stdio.js`, SSE emulators), loopback tests, and dedicated debug tooling for developers and AI.
-3. **Requirements & Architecture Decision Records (ADRs)**: Requirements use clear narrative acceptance criteria by default. Formal `REQ-xxx` prefixes are reserved for projects where formal ADR (Architecture Decision Record) catalogs are explicitly used.
-4. **Guardrails & Closed-Loop Testing**: Establish tight guardrails via requirements, design plans, and simulation harnesses with **closed-loop feedback** (executing against running processes, ingesting structured 6-part feedback envelopes, and using output metrics to iteratively improve performance, accuracy, and UI stability).
-5. **Traditional Git Flow Discipline**: Strict branching model (`main`, `develop`, `release/*`, `feature/*`, `hotfix/*`). All development occurs on isolated `feature/*` branches off `develop`, merged via PR passing all CI gates.
-6. **Atomic Commits**: Create fine-grained, **atomic commits** on the branch with clear messages so history is traceable and progress can be reviewed step-by-step.
-7. **High Code Coverage**: Target **>80% code coverage** with meaningful unit, integration, and E2E test suites.
-8. **SOLID & DRY Modularity**: Heavy emphasis on SOLID principles, small and focused files ($\le$ 500 LOC), and breaking apart multi-concern components. Avoid copy-paste and one-offs—design modules to be reusable, pluggable, and extensible.
-9. **APIs First, MCP Later**: Domain logic, models, schemas, and persistence live in typed, self-contained APIs (Minimal APIs or Controllers) first. Expose Model Context Protocol (MCP) server tools as lightweight wrapper adapters second for AI agent integration.
-10. **Security & Encryption by Default**: Encrypt sensitive data at rest and in transit via self-contained symmetric encryption (AES-256-GCM, avoiding OS-locked DPAPI/Vault dependencies) and apply authentication/authorization unless explicitly deemed unnecessary.
-11. **LLM Integration Standard**: When implementing LLM features, standardize on **LiteLLM / OpenAI SDK** compatibility (for unified completions, streaming, embeddings, tool calling, and model routing).
-12. **Automated Documentation & Releases**: Automate documentation generation (catalogs, schemas, API docs), automated version bumping (`bump_version.py`, `commit.sh`), and release pipelines (`verify_release.py`, GitHub Actions) wherever possible. Living documentation with Mermaid sequence and flow diagrams, conforming to ASD-STE100.
+### Architecture, Modularity, and APIs First
 
----
+1. **Division of Labor**: Ask clarifying questions early and iterate with rapid prototypes.
+2. **SOLID and DRY Modularity**: Keep classes and files focused and compact (**≤ 500 LOC**). Decompose multi-concern components into reusable, pluggable services (see [SOLID and Modularity](../standards/ENGINEERING_STYLE_GUIDE.md#solid-and-modularity)).
+3. **APIs First, MCP Later**: Implement domain logic, schemas, and persistence inside typed APIs (Minimal APIs or Controllers) first. Expose Model Context Protocol (MCP) tools strictly as thin wrapper adapters second (see [APIs First, MCP Later](../standards/ENGINEERING_STYLE_GUIDE.md#apis-first-mcp-later)).
+4. **Narrative Requirements and ADRs**: Write clear narrative acceptance criteria by default. Reserve formal `REQ-xxx` identifiers for projects that maintain formal Architecture Decision Record (ADR) catalogs.
 
-## 💻 3. Backend Architecture (Modern .NET / C#)
+### Simulation, Verification, and Coverage
 
-- **Language & Runtime**: Modern .NET (C#) with `<Nullable>enable</Nullable>`, `<ImplicitUsings>enable</ImplicitUsings>`, and `.slnx` solution format.
-- **Persistence Philosophy**: Relational SQL (SQLite WAL, MS SQL, MySQL) over NoSQL or heavy ORMs (like Entity Framework Core).
-  - Use **Dapper** / ADO.NET with **Stored Procedures** where appropriate (e.g. security evaluation, audit logging, batch operations) and parameterized queries with `IDbConnectionFactory`.
-  - Enable SQLite WAL mode where applicable (`PRAGMA journal_mode = WAL;`).
-  - **No Heavy ORMs**: Do not introduce Entity Framework Core or NoSQL document databases unless explicitly requested.
-- **API Architecture (APIs First)**: Choose pragmatically between **Controllers** (`[ApiController]`) for rich domain slices and **Minimal APIs** (`Map*Endpoints()`) for lightweight routing and streaming. Ensure domain logic is fully testable and accessible before adding MCP tools.
-- **Resilience**: Thread-safe state machines (`ConcurrentDictionary`, `PendingRequestTcs`), full `CancellationToken` propagation.
+5. **Controls and Simulation Mindset**: Build observable dynamic systems with diagnostic tap points (in-memory ring buffers), simulated transports (`mock_stdio.js`, SSE emulators), and loopback harnesses.
+6. **Closed-Loop Feedback Envelopes**: Capture test failures in the standardized [Six-Part Agent Feedback Envelope](../standards/TESTING_HARNESS_PATTERNS.md#the-six-part-agent-feedback-envelope) to drive deterministic debugging.
+7. **High Code Coverage**: Maintain **≥ 80% code coverage** across unit, integration, and end-to-end test suites using real implementations rather than mock-heavy test theatre.
+
+### Security, AI Integration, and Delivery
+
+8. **Traditional Git Flow and Atomic Commits**: Isolate work on `feature/*` branches with traceable atomic commits.
+9. **Security and Encryption by Default**: Encrypt sensitive data at rest with self-contained **AES-256-GCM** symmetric encryption (avoiding OS-locked DPAPI or external vault dependencies) and enforce authentication and authorization.
+10. **LLM Integration Standard**: Standardize LLM features on **LiteLLM / OpenAI SDK** compatibility for completions, streaming, embeddings, tool calling, and routing.
+11. **Automated Documentation and Releases**: Maintain living Mermaid architecture diagrams and automate release verification via `verify_release.py` and GitHub Actions.
 
 ---
 
-## 🎨 4. Frontend Architecture (React / TypeScript / Zustand / Vite)
+## Backend Architecture
 
-- **Stack**: React, TypeScript in strict mode (`strict: true`), Vite.
-- **State Management**: **Zustand** stores (`use*Store.ts`) with focused state slices and selector hooks.
-- **Linter Policy**: Zero linter warnings permitted (`eslint . --max-warnings 0`).
-- **Styling**: CSS custom properties and theme tokens with dark mode support. Avoid heavy UI library bloat.
+### Solution Format and API Routing
+
+- **Language and Runtime**: Modern .NET 10 (C#) with `<Nullable>enable</Nullable>`, `<ImplicitUsings>enable</ImplicitUsings>`, and `.slnx` solutions (see [Backend Architecture and Persistence](../standards/ENGINEERING_STYLE_GUIDE.md#backend-architecture-and-persistence)).
+- **API Routing**: Choose **Controllers** (`[ApiController]`) for rich multi-route domain slices and **Minimal APIs** (`Map*Endpoints()`) for lightweight routes and streaming endpoints.
+
+### Relational Persistence and Dapper
+
+- Prefer relational SQL (SQLite WAL, MS SQL, or MySQL) over NoSQL or heavy ORMs.
+- Use **Dapper** and ADO.NET with dedicated `.sql` **Stored Procedures** and parameterized queries via `IDbConnectionFactory`.
+- Enable mandatory SQLite WAL pragmas (`PRAGMA journal_mode = WAL;`).
+- Do not introduce Entity Framework Core or NoSQL document stores unless explicitly requested.
+
+### Concurrency and Cancellation
+
+- Manage concurrent state with `ConcurrentDictionary`, `Channel<T>`, and `SemaphoreSlim`.
+- Propagate `CancellationToken` across all asynchronous database, I/O, and streaming operations.
 
 ---
 
-## 🧪 5. Testing & UI Layout UX (Tiered Testing Cadence)
+## Frontend Architecture
 
-Testing adheres to the **Tiered Testing Cadence ("Test When It Makes Sense")**:
+### Zustand Stores and Selectors
 
-1. **Tier 1 (Inner Loop / Rapid Development)**:
-   - High-speed unit tests (xUnit in C#; Vitest + `@testing-library/react` + `happy-dom` in TS).
-   - Real implementations over synthetic mocks; restrict NSubstitute strictly to external 3rd-party boundaries.
-   - Executed on-demand during active coding for immediate feedback.
-2. **Tier 2 (Stabilization Gate / Pre-Manual Verification)**:
-   - Simulation & control harnesses, diagnostic tap points, and Playwright layout audits.
-   - Executed before any manual user verification or before opening PRs to catch regressions early.
-3. **Tier 3 (Pre-PR / Pre-Release / CI Quality Gate)**:
-   - Pairwise multi-provider database matrices, live background process smoke tests, and full 4-stage CI gate.
-   - Executed prior to PR merge and during release stabilization.
+- Build the UI with React, TypeScript in strict mode (`"strict": true`), and Vite (see [React, TypeScript & Vite UI Archetype](react-ts-vite-ui.md)).
+- Organize **Zustand** stores (`use*Store.ts`) into separate domain slices and enforce granular selector hooks.
 
-### Representative Test Harness: Web API Integration
+### CSS Tokens and Linter Policy
 
-Always execute full HTTP roundtrips against a running test host. Use `WebApplicationFactory<Program>` with an in-memory SQLite database configured in WAL mode. Execute real database migrations and real Dapper queries. Never mock internal domain services, database contexts, or repository interfaces. Restrict test doubles strictly to external third-party network boundaries.
+- Style components with pure CSS Modules and custom theme properties (`theme.css`) supporting dark mode.
+- Enforce zero linter warnings in CI (`eslint . --max-warnings 0`).
+
+---
+
+## Testing and Simulation Harnesses
+
+### Three-Tier Testing Cadence
+
+Follow the [Tiered Testing Cadence](../standards/TESTING_HARNESS_PATTERNS.md#tiered-testing-cadence):
+1. **Tier 1 (Inner Loop)**: Run fast unit tests (xUnit in C#; Vitest in TypeScript) on demand during active coding. Restrict test doubles strictly to external third-party edges.
+2. **Tier 2 (Stabilization Gate)**: Run simulation harnesses, diagnostic tap point checks, and Playwright layout audits before manual verification.
+3. **Tier 3 (Pre-PR & CI Gate)**: Execute multi-provider database matrices, live smoke gates, and the 4-stage CI pipeline before merging.
+
+### Web API Integration Harness
+
+Execute full HTTP roundtrips against a running test host using `WebApplicationFactory<Program>` and an in-memory SQLite database in WAL mode (see [C# Fullstack and CLI Harness Recipes](../standards/TESTING_HARNESS_PATTERNS.md#c-net-10-fullstack-and-cli)):
 
 ```csharp
 public class ApiIntegrationTestBase : WebApplicationFactory<Program>
@@ -118,12 +136,8 @@ public class ApiIntegrationTestBase : WebApplicationFactory<Program>
 }
 ```
 
-### Simulation & Controls Harness Tooling
-- **Observable Tap Points**: Event hooks and ring buffers exposing internal states for developer and AI inspection.
-- **Mock Transports & Disturbance**: Synthetic STDIO/SSE harnesses (`mock_stdio.js`) with disconnect triggers, latency spikes, and malformed payload injection.
-- **Structured Feedback**: Standardized 6-part agent feedback envelope (`inputs`, `assumptions`, `active_settings`, `action_history`, `output_delta`, `captured_logs`, with `reproduction_command`).
-- **E2E & Layout UX**: Playwright paired with `playwright-layout-inspector` to audit:
-  - Zero horizontal overflow (`expect(page).toHaveNoLayoutOverflow()`)
-  - Mobile viewport fit & zoom accessibility (`expect(page).toHaveMobileFit()`)
-  - Touch ergonomics (`expect(page).toHaveTouchFriendlyTargets({ minSize: 24 })`)
-  - Composite UX score (`expect(page).toPassLayoutAudit({ minScore: 85 })`)
+### Controls Tooling and UI Layout Audits
+
+- **Observable Tap Points**: Expose internal state transitions via event hooks and ring buffers (see [Diagnostic Tap Points](../standards/TESTING_HARNESS_PATTERNS.md#diagnostic-tap-points-and-agent-introspection)).
+- **Synthetic Disturbance Transports**: Test disconnect recovery and latency resilience with `mock_stdio.js` (see [Harness Types and Simulation Patterns](../standards/TESTING_HARNESS_PATTERNS.md#harness-types-and-simulation-patterns)).
+- **UI Layout Audits**: Enforce the 4-point `playwright-layout-inspector` audit (zero horizontal overflow, mobile viewport fit, touch targets ≥ 24px, and layout score ≥ 85; see [UI Layout Stability and Ergonomics Auditing](../standards/TESTING_HARNESS_PATTERNS.md#ui-layout-stability-and-ergonomics-auditing)).

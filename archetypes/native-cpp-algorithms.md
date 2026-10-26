@@ -1,26 +1,26 @@
-# ⚡ Archetype: Modern C++ Native Systems & Algorithms
+# Archetype: Modern C++ Native Systems and Algorithms
 
-> **Target Domain**: High-performance compute, geometric modeling, vision processing, low-level protocol engines, and native libraries with C# / Python interop.
+> **Target Domain**: High-performance compute, geometric modeling, vision processing, low-level protocol engines, and native libraries with C# and Python interop.
 
 ---
 
-## 🛠️ Technology Stack
+## Technology Stack
 
-| Layer | Technology | Rationale / Convention |
+| Layer | Technology | Rationale and Convention |
 | :--- | :--- | :--- |
-| **Language Standard** | Modern C++20 / C++23 | Concepts, ranges, `std::span`, `std::string_view`, `std::expected`. |
-| **Build System** | MSBuild (`.vcxproj`) & CMake | Visual Studio MSBuild for Windows; CMake for cross-platform / Linux targets. |
+| **Language Standard** | Modern C++20 / C++23 | Concepts, ranges, `std::span`, `std::string_view`, and `std::expected`. |
+| **Build System** | MSBuild (`.vcxproj`) & CMake | Visual Studio MSBuild for Windows; CMake for cross-platform and Linux targets. |
 | **Package Manager** | `vcpkg` | Manifest mode (`vcpkg.json`) for deterministic multi-platform dependencies. |
-| **Memory Safety** | Strict RAII & Smart Pointers | `std::unique_ptr`, `std::shared_ptr`. Zero naked `new`/`delete` or raw owning pointers. |
-| **Testing & Profiling** | GoogleTest (`gtest`) + Benchmark | Unit & simulation suites; Google Benchmark for algorithmic performance profiling. |
+| **Memory Safety** | Strict RAII & Smart Pointers | `std::unique_ptr` and `std::shared_ptr`. Zero naked `new`/`delete` or raw owning pointers. |
+| **Testing & Profiling** | GoogleTest (`gtest`) + Benchmark | Unit and simulation suites; Google Benchmark for algorithmic performance profiling. |
 | **Sanitizers & Diagnostics** | ASan (`-fsanitize=address`) & UBSan | Automated memory safety and undefined behavior detection in CI. |
-| **Interoperability** | `extern "C"` / `pybind11` | C-style exports for C# `[LibraryImport]` / P-Invoke; `pybind11` for Python extensions. |
+| **Interoperability** | `extern "C"` / `pybind11` | C-style exports for C# `[LibraryImport]` P/Invoke and `pybind11` for Python extensions. |
 
 ---
 
-## 📁 Directory Structure
+## Directory Structure
 
-```
+```text
 MyNativeLib/
 ├── vcpkg.json
 ├── CMakeLists.txt
@@ -45,7 +45,11 @@ MyNativeLib/
 
 ---
 
-## ⚙️ C-ABI Interop Pattern for C# and Python
+## C-ABI Interop Pattern for CSharp and Python
+
+### C++ Export Header
+
+Expose a clean C-ABI boundary (`extern "C"`) so managed runtimes can invoke native algorithms without C++ name-mangling or exception-boundary issues:
 
 ```cpp
 // include/my_native_lib/api.h
@@ -68,6 +72,10 @@ extern "C" {
 }
 ```
 
+### C# LibraryImport Binding
+
+Consume the exported C-ABI symbols in .NET 10 using source-generated `[LibraryImport]` and zero-allocation `Span<T>` buffers:
+
 ```csharp
 // C# .NET 10 Consumption via [LibraryImport]
 using System.Runtime.InteropServices;
@@ -87,9 +95,17 @@ public static partial class NativeInterop
 
 ---
 
-## 🧪 Representative Test Harness: Parameter Sweeps & Boundary Stress
+## Representative Test Harness: Parameter Sweeps
 
-Test numerical algorithms and solvers using parameterized GoogleTest suites (`TEST_P`). Sweep parameter spaces across boundary values (`-1e5`, `-1.0`, `0.0`, `1.0`, `1e5`) and disturbance combinations. Do not mock mathematical algorithms, numerical convergence routines, or hardware state machines. Always execute test suites under AddressSanitizer (ASan) and UndefinedBehaviorSanitizer (UBSan). Assert mathematical convergence, residual error tolerances, and iteration budgets.
+### Boundary and Disturbance Sweeps
+
+Verify numerical algorithms and solvers using parameterized GoogleTest suites (`TEST_P`; see [C++ Native Algorithms Harness Recipes](../standards/TESTING_HARNESS_PATTERNS.md#c-c-20-23-native-algorithms)):
+- Sweep parameter spaces across boundary values (`-1e5`, `-1.0`, `0.0`, `1.0`, `1e5`) and learning rate combinations.
+- Never mock mathematical algorithms, numerical convergence routines, or hardware state machines.
+- Execute all test suites under AddressSanitizer (ASan) and UndefinedBehaviorSanitizer (UBSan).
+- Assert convergence flags, residual error tolerances, and iteration limits.
+
+### GoogleTest Parameterized Suite
 
 ```cpp
 #include <gtest/gtest.h>

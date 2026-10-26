@@ -1,30 +1,30 @@
 ---
 title: "Archetype: React TS Vite UI"
-description: "React 19, TypeScript, Zustand, TailwindCSS, and Playwright layout audits."
+description: "React 19, TypeScript, Zustand, CSS Modules, and Playwright layout audits."
 ---
 
-# ⚛️ Archetype: React, TypeScript & Vite Frontend
+# Archetype: React, TypeScript, and Vite Frontend
 
 > **Target Domain**: Standalone web applications, interactive dashboards, monitoring portals, and web interfaces with strict layout stability.
 
 ---
 
-## 🛠️ Technology Stack
+## Technology Stack
 
-| Layer | Technology | Rationale / Convention |
+| Layer | Technology | Rationale and Convention |
 | :--- | :--- | :--- |
-| **Framework & Engine** | React 18+ / TypeScript / Vite | Strict TypeScript (`"strict": true`), fast HMR, optimized bundles. |
-| **State Management** | **Zustand** (`use*Store.ts`) | Focused slices, separate files per domain/controller, mandatory granular selectors. |
-| **Styling & Theming** | Pure CSS Modules + Custom Properties | Theme tokens in `theme.css`, dark mode support, zero heavy UI bloat. |
-| **Data Fetching** | Native `fetch` API wrappers | Lean API clients; avoid heavy TanStack Query unless caching strictly requires it. |
-| **Testing & Quality** | Vitest + Playwright + Layout Inspector | Unit tests via Vitest; E2E + 4-point layout audit via `playwright-layout-inspector`. |
-| **Linting** | ESLint with Zero Warnings | `eslint . --max-warnings 0` gate in CI. |
+| **Framework & Engine** | React 18+ / TypeScript / Vite | Strict TypeScript (`"strict": true`), fast HMR, and optimized bundles (see [Frontend Architecture](/standards/engineering-style-guide#frontend-architecture)). |
+| **State Management** | **Zustand** (`use*Store.ts`) | Focused slices, separate files per domain or controller, and mandatory granular selectors. |
+| **Styling & Theming** | Pure CSS Modules + Custom Properties | Theme tokens in `theme.css`, dark mode support, and zero heavy UI library bloat. |
+| **Data Fetching** | Native `fetch` API wrappers | Lean API clients; avoid heavy external query libraries unless complex caching requires them. |
+| **Testing & Quality** | Vitest + Playwright + Layout Inspector | Unit tests via Vitest; end-to-end and 4-point layout audit via `playwright-layout-inspector`. |
+| **Linting** | ESLint with Zero Warnings | `eslint . --max-warnings 0` gate enforced in CI. |
 
 ---
 
-## 📁 Directory Structure
+## Directory Structure
 
-```
+```text
 frontend/
 ├── index.html
 ├── package.json
@@ -59,7 +59,9 @@ frontend/
 
 ---
 
-## ⚙️ Zustand Store with Granular Selector Discipline
+## Zustand Store with Granular Selector Discipline
+
+Partition state into dedicated domain store files and subscribe with granular selector functions to prevent unnecessary component re-renders (see [Zustand State and Granular Selectors](/standards/engineering-style-guide#zustand-state-and-granular-selectors)):
 
 ```typescript
 // src/stores/useServerStore.ts
@@ -106,13 +108,17 @@ export const useServerStore = create<ServerState>((set) => ({
 
 ---
 
-## 🧪 Representative Test Harness: Playwright E2E & Layout Audit
+## Representative Test Harness: Playwright and Layout Audit
 
-Execute realistic operator user journeys against live running frontend applications. Do not write shallow component tests that mock sub-components with empty `<div>` tags. Avoid fragile DOM snapshot testing. Validate user inputs, state transitions, and visible DOM changes. Combine functional interaction checks with the mandatory 4-point layout inspector audit:
-1. Zero horizontal layout overflow (`toHaveNoLayoutOverflow`).
-2. Mobile viewport fit (`toHaveMobileFit`).
-3. Touch target ergonomics ($\ge$ 24px) (`toHaveTouchFriendlyTargets`).
-4. Composite layout quality score ($\ge$ 85) (`toPassLayoutAudit`).
+### Four-Point Layout Audit Requirements
+
+Execute realistic operator user journeys against live running frontend applications. Do not write shallow component tests that mock child components with empty `<div>` tags or rely on fragile DOM snapshots. Combine functional interaction assertions with the 4-point `playwright-layout-inspector` audit (see [UI Layout Stability and Ergonomics Auditing](/standards/testing-harness-patterns#ui-layout-stability-and-ergonomics-auditing)):
+1. **Zero Horizontal Overflow**: `toHaveNoLayoutOverflow()`
+2. **Mobile Viewport Fit**: `toHaveMobileFit()`
+3. **Touch Target Ergonomics (≥ 24px)**: `toHaveTouchFriendlyTargets({ minSize: 24 })`
+4. **Composite Layout Score (≥ 85)**: `toPassLayoutAudit({ minScore: 85 })`
+
+### Playwright User Journey Recipe
 
 ```typescript
 // tests/e2e/order-journey.spec.ts

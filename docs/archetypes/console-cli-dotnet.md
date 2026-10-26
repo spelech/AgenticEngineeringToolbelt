@@ -1,31 +1,31 @@
 ---
 title: "Archetype: .NET Console & CLI"
-description: "Production-grade CLI utilities with Specter.Console and command routing."
+description: "Production-grade CLI utilities with System.CommandLine, dependency injection, and subprocess test harnesses."
 ---
 
-# 🏛️ Archetype: C# Console & CLI Application
+# Archetype: C# Console and CLI Application
 
 > **Target Domain**: High-performance command-line utilities, background daemons, developer tools, batch workers, and protocol runners.
 
 ---
 
-## 🛠️ Technology Stack
+## Technology Stack
 
-| Layer | Technology | Rationale / Convention |
+| Layer | Technology | Rationale and Convention |
 | :--- | :--- | :--- |
 | **Runtime & Language** | .NET 10 / C# 13 | `<Nullable>enable</Nullable>`, `<ImplicitUsings>enable</ImplicitUsings>`, `.slnx` format. |
-| **CLI Framework** | `System.CommandLine` or `CommandLineParser` | Robust argument parsing, verb/subcommand dispatching, type validation. |
-| **Dependency Injection** | `Microsoft.Extensions.Hosting` | Full `IHost` / `HostApplicationBuilder`, `Microsoft.Extensions.DependencyInjection`. |
-| **Logging & Output** | `ILogger` + `--json` Output Stream | Human-friendly console logs + structured JSON mode for agent consumption. |
+| **CLI Framework** | `System.CommandLine` or `CommandLineParser` | Robust argument parsing, verb and subcommand dispatching, and type validation. |
+| **Dependency Injection** | `Microsoft.Extensions.Hosting` | Full `IHost` / `HostApplicationBuilder` and `Microsoft.Extensions.DependencyInjection`. |
+| **Logging & Output** | `ILogger` + `--json` Output Stream | Human-friendly console logs plus structured JSON mode for agent consumption. |
 | **Packaging & Binary** | Framework-Dependent + Native AOT Ready | `<PublishAot>` compatibility for instant startup when required. |
-| **Persistence** | SQLite WAL / Dapper (if required) | `IDbConnectionFactory`, stored procedure `.sql` files. |
-| **Testing** | xUnit + Subprocess Fixtures | Simulation test harnesses with real subprocess execution and cancellation token tests. |
+| **Persistence** | SQLite WAL / Dapper (if required) | `IDbConnectionFactory` and stored procedure `.sql` files (see [Relational Persistence and SQLite WAL](/standards/engineering-style-guide#relational-persistence-and-sqlite-wal)). |
+| **Testing** | xUnit + Subprocess Fixtures | Simulation harnesses with real subprocess execution and `CancellationToken` verification. |
 
 ---
 
-## 📁 Directory Structure
+## Directory Structure
 
-```
+```text
 MyCliTool/
 ├── MyCliTool.slnx
 ├── Directory.Build.props
@@ -58,9 +58,12 @@ MyCliTool/
 
 ---
 
-## ⚙️ Core Implementation Patterns
+## Core Implementation Patterns
 
-### 1. Program.cs & Host Builder
+### Host Builder and Command Wiring
+
+Wire services through `Host.CreateApplicationBuilder` and register global inspection flags on `RootCommand`:
+
 ```csharp
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -95,18 +98,20 @@ return await rootCommand.InvokeAsync(args);
 
 ---
 
-## 🔍 Diagnostic Tap Points & Agent Flags
+## Diagnostic Tap Points and Agent Flags
 
-Every CLI tool must support standard agent inspection flags:
-1. **`--json`**: Emits raw JSON objects to `stdout` for autonomous agent parsing.
+Support three standard agent inspection flags on every CLI tool (see [Diagnostic Tap Points](/standards/testing-harness-patterns#diagnostic-tap-points-and-agent-introspection)):
+1. **`--json`**: Emits structured JSON objects to `stdout` for autonomous agent parsing.
 2. **`--dry-run`**: Validates parameters, queries external state, and simulates processing without destructive writes.
-3. **`-v / -vv / -vvv`**: Increases logging verbosity and dumps internal ring buffer diagnostics upon failure.
+3. **`-v / -vv / -vvv`**: Increases logging verbosity and dumps internal ring-buffer diagnostics upon failure.
 
 ---
 
-## 🧪 Representative Subprocess Test Harness Recipe
+## Representative Subprocess Test Harness
 
-Always test CLI commands through real subprocess execution. Do not mock command handlers or parse methods directly. The `CliExecutionHarness` executes the CLI binary or `dotnet run` inside an isolated temporary workspace directory.
+### CLI Execution Fixture
+
+Test CLI commands through real subprocess execution inside an isolated temporary workspace directory. Never mock command handlers or argument parsers directly (see [C# Fullstack and CLI Harness Recipes](/standards/testing-harness-patterns#c-net-10-fullstack-and-cli)):
 
 ```csharp
 public class CliExecutionHarness : IDisposable
@@ -135,7 +140,8 @@ public class CliExecutionHarness : IDisposable
 ```
 
 ### Verification Guidelines
+
 - Assert expected process exit codes (`0` for success, non-zero for handled errors).
-- Assert machine-readable stdout outputs when `--json` flag is provided.
+- Assert machine-readable `stdout` payloads when the `--json` flag is supplied.
 - Assert expected filesystem mutations inside `TempWorkspace`.
-- Test failure conditions with invalid arguments, simulated timeouts, and non-zero exit codes.
+- Verify error handling with invalid arguments, simulated timeouts, and non-zero exit codes.

@@ -12,7 +12,7 @@ from pathlib import Path
 # Add scripts directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent))
 
-from verify_release import audit_test_theatre, strip_single_line_comments
+from verify_release import audit_test_theatre, check_markdown_links, strip_single_line_comments
 
 
 class TestVerifyReleaseTestTheatreAudit(unittest.TestCase):
@@ -470,6 +470,41 @@ public class CommentedTests
         self.assertNotIn('mockRepo.Verify', cs_stripped)
         self.assertIn('var x = 1;', cs_stripped)
         self.assertEqual(len(cs_input.splitlines()), len(cs_stripped.splitlines()))
+
+    def test_markdown_section_anchors_and_formatting_validated(self):
+        """Test that check_markdown_links validates section anchors and flags unrendered LaTeX."""
+        docs_dir = self.root / "docs"
+        docs_dir.mkdir(parents=True)
+
+        target_doc = docs_dir / "guide.md"
+        target_doc.write_text(
+            "# Guide Overview\n\n"
+            "## Foundational Engineering Principles\n\n"
+            "### SOLID and Modularity\n\n"
+            "Keep files at or below ≤ 500 LOC.\n"
+        )
+
+        valid_index = docs_dir / "index.md"
+        valid_index.write_text(
+            "# Home\n\n"
+            "See [SOLID Rules](guide.md#solid-and-modularity) and [Top](#home).\n"
+        )
+
+        self.assertTrue(check_markdown_links(self.root))
+
+        # Introduce a broken anchor link
+        valid_index.write_text(
+            "# Home\n\n"
+            "See [Missing Anchor](guide.md#non-existent-header).\n"
+        )
+        self.assertFalse(check_markdown_links(self.root))
+
+        # Restore valid link but introduce unrendered LaTeX math symbol
+        valid_index.write_text(
+            "# Home\n\n"
+            "Maintain $\\ge$ 80% coverage in [Guide](guide.md#solid-and-modularity).\n"
+        )
+        self.assertFalse(check_markdown_links(self.root))
 
 
 if __name__ == "__main__":

@@ -6,7 +6,7 @@ REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 echo "🛠️ Installing AgenticEngineeringToolbelt skills into agent directories..."
 
-SKILLS=("engineering-archetype" "scaffold-project" "test-harness-builder")
+SKILLS=("engineering-archetype" "scaffold-project" "test-harness-builder" "code-review-foci")
 
 # 1. Antigravity / Gemini CLI
 GEMINI_SKILLS_DIR="$HOME/.gemini/antigravity-cli/skills"
@@ -38,4 +38,4 @@ if [ -d "/containers/.agents" ]; then
     done
 fi
 
-echo "✨ Installation complete! All skills (engineering-archetype, scaffold-project, test-harness-builder) are active."
+echo "✨ Installation complete! All skills (engineering-archetype, scaffold-project, test-harness-builder, code-review-foci) are active."

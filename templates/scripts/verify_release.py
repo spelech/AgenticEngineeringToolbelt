@@ -201,22 +201,103 @@ def check_manifest_versions(root_dir: Path, target_version: Optional[str] = None
         print(f"✅ All manifests synchronized ({len(found_versions)} manifest(s) checked).")
     return all_valid
 
+def slugify_heading(heading: str) -> Set[str]:
+    """Computes GitHub and VitePress compatible anchor slugs for a Markdown heading."""
+    text = heading.strip()
+    # Strip custom {#anchor} if present and include it
+    custom_match = re.search(r"\{#([a-zA-Z0-9_-]+)\}\s*$", text)
+    slugs: Set[str] = set()
+    if custom_match:
+        slugs.add(custom_match.group(1).lower())
+        text = text[:custom_match.start()].strip()
+
+    # Strip markdown links, inline code backticks, and emphasis markers
+    text = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", text)
+    text = text.replace("`", "").replace("**", "").replace("*", "")
+    text_lower = text.lower()
+
+    # VitePress / GitHub standard slug: replace non-alphanumeric sequences with single hyphen
+    vp_slug = re.sub(r"[^a-z0-9]+", "-", text_lower).strip("-")
+    if vp_slug:
+        slugs.add(vp_slug)
+        if vp_slug[0].isdigit():
+            slugs.add(f"_{vp_slug}")
+
+    # GitHub strict slug: remove punctuation other than spaces/hyphens, then convert spaces to hyphens
+    gh_cleaned = re.sub(r"[^\w\s-]", "", text_lower).strip()
+    gh_slug = re.sub(r"[\s]+", "-", gh_cleaned)
+    if gh_slug:
+        slugs.add(gh_slug)
+
+    return slugs
+
+
+def extract_markdown_headings(md_path: Path) -> Set[str]:
+    """Extracts all valid heading anchor slugs from a Markdown file, ignoring fenced code blocks."""
+    if not md_path.is_file():
+        return set()
+    content = md_path.read_text(encoding="utf-8", errors="ignore")
+    # Strip fenced code blocks
+    content_no_code = re.sub(r"```.*?```", "", content, flags=re.DOTALL)
+    anchors: Set[str] = set()
+    for match in re.finditer(r"^(#{1,6})\s+(.+)$", content_no_code, flags=re.MULTILINE):
+        anchors.update(slugify_heading(match.group(2)))
+    return anchors
+
+
+UNRENDERED_LATEX_PATTERN = re.compile(
+    r"(\$\$[^$]+\$\$|\$[^$\n]*(?:\\ge|\\le|\\text|\\neq|\\approx|\\pm)[^$\n]*\$|\\(?:ge|le|text)\b)"
+)
+
+
 def check_markdown_links(root_dir: Path) -> bool:
-    print("🔍 Auditing markdown relative links and anchors...")
+    print("🔍 Auditing markdown relative links, section anchors, and formatting...")
     has_errors = False
-    md_files = [f for f in root_dir.rglob("*.md") if not is_excluded(f) and not is_template_dir(f)]
+    md_files = [
+        f for f in root_dir.rglob("*.md")
+        if not is_excluded(f) and not is_template_dir(f) and "superpowers" not in f.parts
+    ]
 
     link_pattern = re.compile(r'\[([^\]]+)\]\(([^)]+)\)')
+    heading_cache: dict[Path, Set[str]] = {}
+
+    def get_anchors(path: Path) -> Set[str]:
+        resolved = path.resolve()
+        if resolved not in heading_cache:
+            heading_cache[resolved] = extract_markdown_headings(resolved)
+        return heading_cache[resolved]
 
     for md_file in md_files:
         content = md_file.read_text(encoding="utf-8", errors="ignore")
-        links = link_pattern.findall(content)
+        content_no_fences = re.sub(r"```.*?```", "", content, flags=re.DOTALL)
+        content_no_code = re.sub(r"`[^`\n]+`", "", content_no_fences)
+
+        # Check for unrendered LaTeX math symbols in prose
+        latex_match = UNRENDERED_LATEX_PATTERN.search(content_no_code)
+        if latex_match:
+            print(
+                f"❌ Unrendered LaTeX math syntax in {md_file.relative_to(root_dir)}: "
+                f"'{latex_match.group(0)}' (use Unicode symbols like ≥, ≤ or code blocks)"
+            )
+            has_errors = True
+
+        links = link_pattern.findall(content_no_fences)
         for text, link in links:
-            # Skip external protocols, anchor-only links, and special editor schemes
-            if any(link.startswith(proto) for proto in ["http://", "https://", "mailto:", "#", "file:", "conversation:"]):
+            link_clean = link.strip()
+            # Skip external protocols and special editor schemes
+            if any(link_clean.startswith(proto) for proto in ["http://", "https://", "mailto:", "file:", "conversation:"]):
                 continue
 
-            target_path = link.split("#")[0].strip()
+            if link_clean.startswith("#"):
+                anchor = link_clean[1:].strip().lower()
+                if anchor and anchor not in get_anchors(md_file):
+                    print(f"❌ Broken same-page anchor in {md_file.relative_to(root_dir)}: [{text}]({link})")
+                    has_errors = True
+                continue
+
+            parts = link_clean.split("#", 1)
+            target_path = parts[0].strip()
+            anchor = parts[1].strip().lower() if len(parts) > 1 else ""
             if not target_path:
                 continue
 
@@ -229,26 +310,39 @@ def check_markdown_links(root_dir: Path) -> bool:
             else:
                 candidates = [md_file.parent / target_path]
 
-            resolved_exists = False
+            resolved_file: Optional[Path] = None
             for cand in candidates:
                 cand_res = cand.resolve()
+                if cand_res.is_file():
+                    resolved_file = cand_res
+                    break
+                if cand_res.with_suffix(".md").is_file():
+                    resolved_file = cand_res.with_suffix(".md")
+                    break
+                if (cand_res / "index.md").is_file():
+                    resolved_file = cand_res / "index.md"
+                    break
+                if (cand_res / "README.md").is_file():
+                    resolved_file = cand_res / "README.md"
+                    break
                 if cand_res.exists():
-                    resolved_exists = True
-                    break
-                # Support VitePress extensionless route links (.md omitted)
-                if cand_res.with_suffix(".md").exists():
-                    resolved_exists = True
-                    break
-                if (cand_res / "index.md").exists():
-                    resolved_exists = True
+                    resolved_file = cand_res
                     break
 
-            if not resolved_exists:
+            if resolved_file is None:
                 print(f"❌ Broken link in {md_file.relative_to(root_dir)}: [{text}]({link})")
                 has_errors = True
+            elif anchor and resolved_file.is_file() and resolved_file.suffix.lower() == ".md":
+                valid_anchors = get_anchors(resolved_file)
+                if anchor not in valid_anchors:
+                    print(
+                        f"❌ Broken section anchor in {md_file.relative_to(root_dir)}: "
+                        f"[{text}]({link}) -> '#{anchor}' not found in {resolved_file.relative_to(root_dir)}"
+                    )
+                    has_errors = True
 
     if not has_errors:
-        print("✅ All markdown links verified successfully.")
+        print("✅ All markdown links, section anchors, and formatting checks passed.")
     return not has_errors
 
 # ==============================================================================

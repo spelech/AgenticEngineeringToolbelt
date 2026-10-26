@@ -1,4 +1,4 @@
-# 🐍 Archetype: Python FastAPI & FastMCP Service (APIs First, MCP Later)
+# Archetype: Python FastAPI and FastMCP Service
 
 > **Architect**: Steven T. Pelech  
 > **Target Domain**: Scrapers, data pipelines, computer vision, AI/ML workflows, automation engines, and native Model Context Protocol (MCP) servers.  
@@ -6,36 +6,38 @@
 
 ---
 
-## 🔌 1. Architectural Philosophy: APIs First, MCP Later
+## Architectural Philosophy: APIs First, MCP Later
 
-1. **APIs First**:
-   - Design and implement domain models, validation, and business logic inside self-contained core engines and typed FastAPI endpoints.
-   - All capabilities must be fully testable via standard unit tests and HTTP client calls without requiring an MCP client.
-2. **MCP Later**:
-   - Expose Model Context Protocol (MCP) server tools as lightweight wrapper functions delegating directly to the underlying domain engine or internal API services.
-   - Do not embed proprietary domain logic, database queries, or unvalidated state transformations directly inside MCP tool handlers.
-3. **Dual Accessibility**:
-   - The service is simultaneously consumable by human developers / web frontends via OpenAPI/REST and by autonomous AI agents via FastMCP (SSE / Streamable HTTP / STDIO).
+### Core Domain APIs First
+
+- Design and implement domain models, validation, and business logic inside self-contained core engines and typed FastAPI endpoints (see [APIs First, MCP Later](../standards/ENGINEERING_STYLE_GUIDE.md#apis-first-mcp-later)).
+- Verify all capabilities through standard unit tests and HTTP client roundtrips without requiring an MCP runtime.
+
+### Thin MCP Wrappers Second
+
+- Expose Model Context Protocol (MCP) server tools as lightweight wrapper functions that delegate directly to the underlying domain engine or internal API services.
+- Never embed proprietary domain logic, raw database queries, or unvalidated state mutations inside MCP tool handlers.
+- Serve human developers and web frontends via OpenAPI/REST while simultaneously serving AI agents via FastMCP (Streamable HTTP, SSE, or STDIO).
 
 ---
 
-## 🛠️ 2. Technology Stack
+## Technology Stack
 
-| Layer | Technology | Rationale / Convention |
+| Layer | Technology | Rationale and Convention |
 | :--- | :--- | :--- |
-| **Runtime & Package Manager** | Python 3.12+ / `uv` | Modern `pyproject.toml` managed with ultra-fast `uv`. |
-| **API & Web Framework** | FastAPI + Uvicorn | High-performance asynchronous REST API with automatic OpenAPI docs. |
-| **Agent Tooling (MCP)** | FastMCP / MCP SDK | Native Streamable HTTP / SSE / STDIO Model Context Protocol endpoint wrapping domain APIs. |
-| **Data Validation & Settings** | Pydantic v2 + `pydantic-settings` | Strict typing, immutable schemas, environment & `.env` parsing. |
+| **Runtime & Package Manager** | Python 3.12+ / `uv` | Modern `pyproject.toml` managed with fast `uv`. |
+| **API & Web Framework** | FastAPI + Uvicorn | High-performance asynchronous REST API with automatic OpenAPI documentation. |
+| **Agent Tooling (MCP)** | FastMCP / MCP SDK | Native Streamable HTTP, SSE, and STDIO Model Context Protocol endpoints wrapping domain APIs. |
+| **Data Validation & Settings** | Pydantic v2 + `pydantic-settings` | Strict typing, immutable schemas, and environment / `.env` parsing. |
 | **CLI & Commands** | Typer | Type-hint driven CLI interface reusing Pydantic models. |
-| **Persistence** | SQLite / `aiosqlite` / async SQLAlchemy | Async relational access, clean schema migrations. |
-| **Testing & Quality** | `pytest` + `pytest-asyncio` + `ruff` | $\ge$ 80% coverage via `pytest-cov`, zero linter errors via `ruff`. |
+| **Persistence** | SQLite / `aiosqlite` / async SQLAlchemy | Asynchronous relational access and clean schema migrations. |
+| **Testing & Quality** | `pytest` + `pytest-asyncio` + `ruff` | **≥ 80% coverage** via `pytest-cov` and zero linter errors via `ruff`. |
 
 ---
 
-## 📁 3. Directory Structure
+## Directory Structure
 
-```
+```text
 my_service/
 ├── pyproject.toml
 ├── README.md
@@ -72,19 +74,16 @@ my_service/
 
 ---
 
-## ⚙️ 4. FastMCP Integration Pattern (APIs First, MCP Later)
+## FastMCP Integration Pattern
 
 ```python
 """Example demonstrating APIs First, MCP Later architectural pattern."""
 
-from fastapi import FastAPI, APIRouter, HTTPException, Depends
+from fastapi import FastAPI, APIRouter, HTTPException
 from mcp.server.fastmcp import FastMCP
 from pydantic import BaseModel, Field
 
-# ============================================================================
-# 1. CORE DOMAIN: Models & Engine (APIs First)
-# ============================================================================
-
+# 1. Core Domain: Models & Engine (APIs First)
 class ProcessRequest(BaseModel):
     item_id: str = Field(..., description="Target entity identifier")
     dry_run: bool = Field(False, description="Simulate execution without persisting changes")
@@ -100,7 +99,6 @@ class DomainEngine:
     async def execute_processing(self, request: ProcessRequest) -> ProcessResult:
         if not request.item_id:
             raise ValueError("item_id cannot be empty")
-        # Perform actual domain computation or workflow
         return ProcessResult(
             item_id=request.item_id,
             status="completed",
@@ -110,10 +108,7 @@ class DomainEngine:
 
 engine = DomainEngine()
 
-# ============================================================================
 # 2. REST API: First-Class FastAPI Endpoints
-# ============================================================================
-
 api_router = APIRouter(prefix="/api/v1")
 
 @api_router.post("/process", response_model=ProcessResult)
@@ -124,10 +119,7 @@ async def process_endpoint(request: ProcessRequest) -> ProcessResult:
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc))
 
-# ============================================================================
-# 3. MCP ADAPTER: Lightweight FastMCP Wrappers (MCP Later)
-# ============================================================================
-
+# 3. MCP Adapter: Lightweight FastMCP Wrappers (MCP Later)
 mcp = FastMCP("my_service", instructions="Provides domain processing tools")
 
 @mcp.tool()
@@ -136,10 +128,7 @@ async def process_entity(request: ProcessRequest) -> dict:
     result = await engine.execute_processing(request)
     return result.model_dump()
 
-# ============================================================================
-# 4. APP LIFECYCLE: Composed FastAPI + FastMCP Server
-# ============================================================================
-
+# 4. App Lifecycle: Composed FastAPI + FastMCP Server
 app = FastAPI(title="My Service API", version="1.0.0")
 app.include_router(api_router)
 mcp.mount(app, prefix="/mcp")
@@ -151,17 +140,16 @@ async def health_check():
 
 ---
 
-## 🧪 5. Testing Cadence & Representative Test Recipes
+## Testing Cadence and Representative Recipes
 
-Testing adheres to the tiered cadence and enforces real transports over synthetic mocks:
-
-- **Tier 1 (Inner Loop)**: Unit tests for `core/engine.py`, Pydantic models, and fast ASGI in-memory client route tests.
+Follow the [Tiered Testing Cadence](../standards/TESTING_HARNESS_PATTERNS.md#tiered-testing-cadence) and use real transports instead of synthetic mocks (see [Python FastAPI and FastMCP Harness Recipes](../standards/TESTING_HARNESS_PATTERNS.md#python-3-12-fastapi-and-fastmcp)):
+- **Tier 1 (Inner Loop)**: Unit tests for `core/engine.py`, Pydantic models, and fast ASGI in-memory route tests.
 - **Tier 2 (Stabilization Gate)**: Integration tests validating FastMCP tool execution via `InMemorySessionClient`, diagnostic tap points, and synthetic simulation loops.
-- **Tier 3 (CI / Release)**: Multi-stage CI pipeline, ruff linter gate (0 errors), and $\ge$ 80% coverage threshold.
+- **Tier 3 (CI & Release)**: Multi-stage CI pipeline, `ruff` linter gate (0 errors), and **≥ 80% coverage** threshold.
 
-### 5.1 ASGI In-Memory Transport with SQLite (FastAPI Integration)
+### ASGI In-Memory Transport with SQLite
 
-Always test FastAPI endpoints through real asynchronous HTTP roundtrips. Use `httpx.AsyncClient` with `ASGITransport(app=app)`. Connect to an ephemeral in-memory or temporary SQLite database. Validate full routing, dependency injection, and middleware. Do not patch internal domain logic with `unittest.mock.patch`.
+Test FastAPI endpoints through asynchronous HTTP roundtrips using `httpx.AsyncClient` with `ASGITransport(app=app)` against an ephemeral SQLite database. Never patch internal domain logic with `unittest.mock.patch`:
 
 ```python
 import pytest
@@ -179,9 +167,9 @@ async def client(tmp_path):
         yield ac
 ```
 
-### 5.2 FastMCP In-Memory Session Client (Agent Tool Verification)
+### FastMCP In-Memory Session Client
 
-Always test FastMCP tools through `InMemorySessionClient`. Exercise live tool execution and validate structured output schemas. Avoid external subprocesses or network socket overhead. Assert observable return payloads and database state changes.
+Test FastMCP tools through `InMemorySessionClient` to exercise live tool execution and validate structured output schemas:
 
 ```python
 import pytest

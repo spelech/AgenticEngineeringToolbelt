@@ -1,168 +1,147 @@
-# 🤖 Universal AGENTS.md
+# Universal Agent Rules (AGENTS.md)
 
 Mandatory architectural guidelines and execution rules for AI coding assistants.
 
 ---
 
-## 🤝 1. Collaboration & Workflow Discipline
+## Collaboration and Workflow Discipline
 
-1. **Proactive Clarifying Questions**: Steven's conceptual designs evolve during development. **Always ask insightful clarifying questions** to nail down requirements, edge cases, and architectural constraints.
-2. **Traditional Git Flow Discipline**:
-   - `main`: Production tagged releases only (`vX.Y.Z`). Every commit represents a verified release. Direct pushes are protected and forbidden.
-   - `develop`: Primary integration branch for ongoing work. Feature branches merge here through Pull Requests.
-   - `feature/*`: Dedicated branches created off `develop` (`feature/feature-name`). Contains isolated unit and functional work. Merges back to `develop` after Tier 2 and Tier 3 gates pass.
-   - `release/*`: Created off `develop` (`release/vX.Y.Z`) when features freeze for an upcoming release. Dedicated to version bumping, changelog finalization, and release verification. Merges into `main` (with release tag) and syncs back to `develop`.
-   - `hotfix/*`: Created directly off `main` (`hotfix/vX.Y.Z`) to address critical production defects. Merges into both `main` (with release tag) and `develop`.
-   - Create **atomic Conventional Commits** (`feat:`, `fix:`, `test:`, `docs:`, `chore:`).
-   - Features must culminate in a PR passing all 4-stage CI quality gates before merging.
-3. **Living Documentation & ASD-STE100**:
-   - Write all user-facing documentation, README files, architectural specs, and living guides adhering strictly to **ASD-STE100 (Simplified Technical English)** principles:
-     - Keep sentences short, concise, and direct ($\le$ 20-25 words per sentence).
-     - Use active voice and imperative mood for instructions.
-     - Eliminate ambiguous jargon, colloquialisms, and redundant synonyms; maintain one core instruction per sentence.
-   - Render architecture, sequence, state, and Git branching diagrams using native **Mermaid syntax** (`flowchart TD`, `sequenceDiagram autonumber`, `stateDiagram-v2`, `gitGraph`).
-   - Host and publish project living documentation via **VitePress** deployed to GitHub Pages.
-4. **APIs First, MCP Later**:
-   - Domain logic and workflows must reside in clean, fully typed, self-contained libraries and REST/gRPC APIs before exposing them via Model Context Protocol (MCP).
-   - MCP tools act strictly as lightweight wrappers that forward requests to underlying service interfaces.
-   - Core capabilities must remain 100% testable and operable through CLI, direct API calls, or unit test harnesses without requiring MCP.
-5. **Container Immutability**:
-   - **NEVER** edit files or hot-patch code inside live running containers.
-   - Always build/pull official images or rebuild via standard compose commands (`docker compose up -d --build`).
-6. **Container Target Architecture**:
+### Proactive Clarification and Git Flow
+
+1. **Proactive Clarifying Questions**: Steven's conceptual designs evolve during development. **Always ask insightful clarifying questions** to define requirements, edge cases, and architectural constraints.
+2. **Traditional Git Flow Discipline** (see [Traditional Git Flow Discipline](../standards/ENGINEERING_STYLE_GUIDE.md#traditional-git-flow-discipline)):
+   - **`main`**: Production tagged releases only (`vX.Y.Z`). Direct pushes are forbidden.
+   - **`develop`**: Primary integration branch for ongoing work. Merge feature branches here through Pull Requests.
+   - **`feature/*`**: Dedicated branches created off `develop` (`feature/feature-name`) for isolated work. Merge back to `develop` after Tier 2 and Tier 3 gates pass.
+   - **`release/*`**: Created off `develop` (`release/vX.Y.Z`) for version bumping, changelog finalization, and release verification before merging into `main` and `develop`.
+   - **`hotfix/*`**: Created directly off `main` (`hotfix/vX.Y.Z`) to fix critical production defects before merging into both `main` and `develop`.
+   - Commit work using atomic **Conventional Commits** (`feat:`, `fix:`, `test:`, `docs:`, `chore:`).
+   - Open a Pull Request and verify that all [Multi-Stage CI/CD Pipeline](../standards/CI_CD_PIPELINES.md#git-flow-trigger-matrix) gates pass before merging.
+
+### Technical Writing and Living Documentation
+
+Write all user-facing documentation, README files, architectural specs, and living guides according to our [Technical Writing Standards](../docs/standards/asd-ste100.md), combining **ASD-STE100 (Simplified Technical English)** and the **Google Developer Documentation Style Guide**:
+- Keep sentences short, concise, and direct (**≤ 25 words per sentence**).
+- Use active voice and second-person imperative mood for instructions.
+- Organize dense topics into scannable `H2` and `H3` headings and scope cross-links to exact `#section` anchors.
+- Use standard Unicode symbols (`≥`, `≤`) instead of raw LaTeX math syntax in prose.
+- Render architecture, sequence, state, and branching diagrams using native **Mermaid syntax** (`flowchart TD`, `sequenceDiagram autonumber`, `stateDiagram-v2`, `gitGraph`).
+- Publish living documentation via **VitePress** deployed to GitHub Pages.
+
+### APIs First and Container Immutability
+
+1. **APIs First, MCP Later** (see [APIs First, MCP Later](../standards/ENGINEERING_STYLE_GUIDE.md#apis-first-mcp-later)):
+   - Implement domain logic and workflows inside clean, typed, self-contained libraries and REST/gRPC APIs before exposing them via Model Context Protocol (MCP).
+   - Keep MCP tools strictly as lightweight wrappers that forward requests to underlying service interfaces.
+   - Ensure core capabilities remain 100% testable through CLI, direct API calls, or integration harnesses without requiring MCP.
+2. **Container Immutability**:
+   - **Never** edit files or hot-patch code inside live running containers.
+   - Always rebuild via standard compose commands (`docker compose up -d --build`) or pull official images.
+3. **Container Target Architecture**:
    - Standardize strictly on native `linux/amd64` for all container builds and CI workflows.
-   - **DO NOT** include QEMU emulation or multi-architecture (`arm64`) build steps in CI/CD pipelines.
+   - Do not include QEMU emulation or multi-architecture (`arm64`) build steps in CI/CD pipelines.
 
 ---
 
-## 🏛️ 2. Core Code & Architectural Discipline
+## Core Code and Architectural Discipline
 
-1. **SOLID & Single Responsibility**: Decompose files and classes exceeding **500 lines of code** into partial classes or focused sub-services.
+### Modularity, Interfaces, and DRY
+
+1. **SOLID and File Size Limit**: Decompose files and classes exceeding **500 lines of code (≤ 500 LOC)** into partial classes or focused sub-services (see [SOLID and Modularity](../standards/ENGINEERING_STYLE_GUIDE.md#solid-and-modularity)).
 2. **Interfaces by Default**: Build client-focused interfaces (`I*` in C#) even for single implementations to ensure loose coupling and testability.
-3. **DRY vs YAGNI**:
-   - **Rule of Three**: Duplication is acceptable across 2 instances; abstract on the 3rd occurrence.
+3. **DRY vs. YAGNI**:
+   - **Rule of Three**: Permit duplication across two instances; refactor into a shared abstraction on the third occurrence.
    - Do not invent speculative multi-tier frameworks (YAGNI).
-4. **Semantic Naming**:
-   - **Banned**: `*Manager`, `*Helper`, `*Util`, `*Data` junk drawers.
-   - **Enforced**: Role/action-based names (`DatabaseSeederService`, `UserAuthenticator`, `ServerStatusCard`, `use*Store.ts`).
-5. **Efficiency**:
-   - **Database**: If an operation requires 3+ database round-trips or complex multi-table joins, consolidate into a single **Stored Procedure** (`.sql` file) or multi-result query.
-   - **Frontend**: Mandatory **granular Zustand selectors** (`useServerStore(s => s.servers.length)`) to prevent render cascades.
-6. **Error Handling & Diagnostics**:
-   - Never leak raw stack traces to API clients.
-   - Capture rich debug logs with the exact inputs and state that caused the error.
+
+### Semantic Naming and Anti-Pattern Bans
+
+- **Banned**: Never create `*Manager`, `*Helper`, `*Util`, or `*Data` junk-drawer classes (see [Semantic Naming and Anti-Pattern Bans](../standards/ENGINEERING_STYLE_GUIDE.md#semantic-naming-and-anti-pattern-bans)).
+- **Enforced**: Use role- and action-based names (`DatabaseSeederService`, `UserAuthenticator`, `ServerStatusCard`, `use*Store.ts`).
+
+### Database, Frontend, and Error Handling
+
+1. **Database Efficiency**: Consolidate operations requiring three or more database round-trips or complex multi-table joins into a single **Stored Procedure** (`.sql` file) or batch query.
+2. **Frontend Selectors**: Use **granular Zustand selectors** (`useServerStore(s => s.servers.length)`) to prevent render cascades.
+3. **Error Handling and Diagnostics**: Never leak raw stack traces to API clients. Log structured debug payloads with the exact inputs and state that triggered the failure.
 
 ---
 
-## 💻 3. Polyglot Language Matrix
+## Polyglot Language Matrix
 
-- **C# (.NET 10)**: `.slnx`, `System.CommandLine`, full DI, Dapper + Stored Procs (separate `.sql` files), SQLite WAL (MySQL-compatible) / MSSQL, native C# UIs (WPF/WinForms/Avalonia, no Electron), full `CancellationToken` propagation.
-- **Python (3.12+)**: `uv`, `pyproject.toml`, FastAPI + FastMCP, Pydantic v2 schemas, `asyncio`, `pytest` ($\ge$ 80% coverage), `ruff`.
-- **TypeScript / React**: React + TS strict + Vite, Zustand domain stores, pure CSS Modules + custom properties, bespoke components, `playwright-layout-inspector` 4-point audit.
-- **C++ (C++20/23)**: MSBuild (Win) / CMake (Linux), `vcpkg`, strict RAII, smart pointers, GoogleTest (`gtest`), ASan/UBSan, Benchmark, C# `[LibraryImport]` / Python `pybind11` interop.
+| Stack | Core Conventions & Tooling | Archetype Blueprint |
+| :--- | :--- | :--- |
+| **C# (.NET 10)** | `.slnx`, `System.CommandLine`, full DI, Dapper + Stored Proc `.sql` files, SQLite WAL / MSSQL, native C# UIs (WPF/WinForms/Avalonia, no Electron), full `CancellationToken` propagation. | [Fullstack (.NET + React)](../archetypes/fullstack-dotnet-react.md) • [.NET Console & CLI](../archetypes/console-cli-dotnet.md) |
+| **Python (3.12+)** | `uv`, `pyproject.toml`, FastAPI + FastMCP, Pydantic v2 schemas, `asyncio`, `pytest` (≥ 80% coverage), `ruff`. | [Python FastAPI & FastMCP](../archetypes/python-fastapi-mcp.md) |
+| **TypeScript / React** | React + strict TS + Vite, Zustand domain stores, pure CSS Modules + custom properties, `playwright-layout-inspector` 4-point audit. | [React, TS & Vite UI](../archetypes/react-ts-vite-ui.md) |
+| **C++ (C++20/23)** | MSBuild (Win) / CMake (Linux), `vcpkg`, strict RAII, smart pointers, GoogleTest (`gtest`), ASan/UBSan, Benchmark, C# `[LibraryImport]` / Python `pybind11` interop. | [C++ Native Algorithms](../archetypes/native-cpp-algorithms.md) |
 
 ---
 
-## 🧪 4. Testing & Agent Verification Protocol
+## Testing and Agent Verification Protocol
+
+### Observable Systems and Tiered Cadence
 
 1. **Software as an Observable Dynamic System**:
    - Model critical workflows, boundary crossings, and stateful protocols with diagnostic tap points, metrics, and health probes.
-   - Build closed-loop simulation harnesses with high-volume testing loops, parameter sweeps, and synthetic disturbance ingestion.
-2. **Tiered Testing Cadence ("Test When It Makes Sense")**:
-   - **Tier 1 (Inner Loop / Rapid Dev)**: Fast, isolated in-memory unit tests on demand. No mandatory test suite runs during early exploratory prototyping or drafting.
-   - **Tier 2 (Stabilization Gate / Pre-Manual Verification)**: Run unit test suites and targeted integration tests once feature interfaces and domain boundaries stabilize, immediately prior to developer or agent manual testing.
-   - **Tier 3 (Pre-PR / Pre-Release / CI Quality Gate)**: Full test matrix, multi-provider integration tests, simulation stress loops, and Playwright layout audits run before merging to `develop`/`main` and in CI.
-3. **Anti-Test Theatre & Representative Verification**:
-   - AI agents and developers must never write **Test Theatre**. Test theatre means mock-heavy tests that verify method calls instead of real system state.
-   - Adhere strictly to the **Four Pillars of Anti-Test Theatre**:
-     - **Pillar 1: Real Over Mock**:
-       - Test software with real components and authentic in-memory equivalents.
-       - Use in-memory SQLite (WAL mode) or ephemeral test databases instead of mocking `IRepository<T>` or `DbContext`.
-       - **Strict Boundary Rule**: Never mock internal domain services, business logic, or local storage.
-       - Mock only unmanageable external third-party network boundaries (for example, Stripe or SendGrid).
-     - **Pillar 2: Outcomes Over Calls**:
-       - Assertions must evaluate observable outcomes: updated database records, generated files, return payloads, or domain events.
-       - **Banned Assertion**: Never use mock invocation counts (such as `mock.Verify(x => x.Save(), Times.Once)`) as primary proof of success.
-       - Assert state mutations directly in the target data store.
-     - **Pillar 3: Representative Dogfooding & Smoke Loops**:
-       - Every feature requires a representative end-to-end journey or CLI/API roundtrip before claiming completion.
-       - If you build a CLI command, execute that CLI command via a real subprocess against a temporary workspace.
-       - If you build an API endpoint, execute a full HTTP request-response cycle through the complete middleware stack.
-     - **Pillar 4: Value Over Numeric Vanity**:
-       - High line-coverage numbers from testing trivial POCOs, record constructors, or getters and setters provide false confidence.
-       - Prioritize boundary conditions, edge cases, synthetic disturbances, and concurrency over shallow line coverage.
-       - Do not write tests for boilerplate POCOs, DTOs, or auto-properties.
-   - Review the complete 12-dimension matrix and polyglot recipes in [**TESTING_HARNESS_PATTERNS.md**](../standards/TESTING_HARNESS_PATTERNS.md).
+   - Build closed-loop simulation harnesses with high-volume stress loops, parameter sweeps, and synthetic disturbance ingestion.
+2. **Tiered Testing Cadence** (see [Tiered Testing Cadence](../standards/TESTING_HARNESS_PATTERNS.md#tiered-testing-cadence)):
+   - **Tier 1 (Inner Loop)**: Run fast, isolated in-memory unit tests on demand during active development.
+   - **Tier 2 (Stabilization Gate)**: Run unit and targeted integration suites once feature interfaces stabilize, immediately before manual verification.
+   - **Tier 3 (Pre-PR & CI Gate)**: Execute the full test matrix, multi-provider integration suites, simulation stress loops, and Playwright layout audits before merging.
 
-```mermaid
-flowchart TD
-    subgraph P1["Pillar 1: Real Over Mock"]
-        direction TB
-        R1["Real In-Memory DBs<br>(SQLite WAL / Ephemeral)"]
-        R2["Real DI Containers & Service Wiring"]
-        R3["Strict Boundary Isolation<br>(Mocks ONLY at 3rd-party edge)"]
-    end
+### The Four Pillars of Anti-Test Theatre
 
-    subgraph P2["Pillar 2: Outcomes Over Calls"]
-        direction TB
-        O1["Observable State Deltas (DB rows, files)"]
-        O2["Return Payloads & Invariants"]
-        O3["BANNED: Mock.Verify() as primary assertion"]
-    end
+Never write **Test Theatre** (mock-heavy tests that verify method calls instead of real system state). Enforce the [Four Pillars of Anti-Test Theatre](../standards/TESTING_HARNESS_PATTERNS.md#the-four-pillars-of-anti-test-theatre) and the 12-dimension [Banned and Mandated Patterns Matrix](../standards/TESTING_HARNESS_PATTERNS.md#banned-and-mandated-patterns-matrix):
 
-    subgraph P3["Pillar 3: Representative Dogfooding"]
-        direction TB
-        D1["Full HTTP Pipeline Roundtrips"]
-        D2["Real CLI Subprocess Execution"]
-        D3["Playwright E2E User Journeys"]
-    end
-
-    subgraph P4["Pillar 4: Value Over Vanity"]
-        direction TB
-        V1["Basis Path & Boundary Sweeps (0-1-N)"]
-        V2["Synthetic Disturbance Ingestion"]
-        V3["BANNED: Testing trivial POCOs for % metrics"]
-    end
-
-    P1 --> RealSystem["Deterministic, High-Confidence Software"]
-    P2 --> RealSystem
-    P3 --> RealSystem
-    P4 --> RealSystem
-```
-
-4. **Deterministic Testing Protocols for Agents**:
-   - **Deterministic Test Budget Formula**:
-     - Analyze the function or feature Abstract Syntax Tree (AST) before authoring tests.
-     - Compute the exact required test suite budget:
-       $$\text{Test Budget} = \text{Nominal (1)} + N_{\text{Branches}} + N_{\text{0-1-N Boundaries}} + N_{\text{Disturbances}}$$
-       - **Nominal Path ($= 1$)**: Exactly one test exercising the happy path with valid nominal data.
-       - **Decision & Guard Branches ($= N_{\text{Branches}}$)**: Exactly one test per independent branch (`if`, `switch`, validation guard, explicit `throw`).
-       - **0-1-N Boundary Conditions ($= 1 \text{ to } 3$)**:
-         - `0`: Empty collection, null parameter, or zero value.
-         - `1`: Single element or minimum boundary threshold.
-         - `N`: Large collection, maximum boundary, or page limit.
-       - **Disturbances / Lifecycle ($= 1$ if async or I/O)**:
-         - For async methods: exactly one test validating cancellation token propagation or timeout recovery.
-         - For state mutations: exactly one test validating idempotency.
+1. **Pillar 1: Real Over Mock**: Test software with real components and in-memory SQLite (WAL mode) databases instead of mocking `IRepository<T>` or `DbContext`. Mock only unmanageable external third-party network boundaries.
+2. **Pillar 2: Outcomes Over Calls**: Assert observable state deltas (database records, generated files, response payloads, emitted events). Never use `mock.Verify()` as primary proof of success.
+3. **Pillar 3: Representative Dogfooding**: Execute a real CLI subprocess or full HTTP request-response roundtrip for every feature before claiming completion.
+4. **Pillar 4: Value Over Numeric Vanity**: Prioritize boundary conditions, disturbances, and concurrency over shallow line coverage. Do not write tests for boilerplate POCOs, DTOs, or auto-properties.
 
 ```mermaid
 flowchart LR
-    AST["Feature / Function AST"] --> Calc["Compute Test Budget"]
+    P1["Pillar 1: Real Over Mock<br>• Real In-Memory DBs (SQLite WAL)<br>• Real DI Containers & Service Wiring<br>• Mocks ONLY at 3rd-party edge"]
+    P2["Pillar 2: Outcomes Over Calls<br>• Observable State Deltas (DB, files)<br>• Return Payloads & Invariants<br>• BANNED: Mock.Verify() primary"]
+    P3["Pillar 3: Representative Dogfooding<br>• Full HTTP Pipeline Roundtrips<br>• Real CLI Subprocess Execution<br>• Playwright E2E User Journeys"]
+    P4["Pillar 4: Value Over Vanity<br>• Basis Path & 0-1-N Sweeps<br>• Synthetic Disturbance Injection<br>• BANNED: Trivial POCO coverage"]
+
+    P1 & P2 & P3 & P4 --> RealSystem["Deterministic,<br>High-Confidence<br>Software"]
+```
+
+### Deterministic Test Budget Formula
+
+Analyze the function or feature Abstract Syntax Tree (AST) before authoring tests to compute the exact required budget (see [Deterministic Test Budget Formula](../standards/TESTING_HARNESS_PATTERNS.md#deterministic-test-budget-formula)):
+
+```text
+Test Budget = 1 (Nominal) + N_Branches + N_Boundaries (0-1-N) + N_Disturbances
+```
+
+- **Nominal Path (1 test)**: One test exercising the happy path with valid nominal data.
+- **Decision and Guard Branches (1 test per branch)**: One test per independent branch (`if`, `switch`, validation guard, or explicit `throw`).
+- **0-1-N Boundary Conditions (1 to 3 tests)**: `0` (empty/null/zero), `1` (single item/minimum), and `N` (large batch/maximum).
+- **Disturbances and Lifecycle (1 test if async or stateful)**: One test validating `CancellationToken` propagation, timeout recovery, or state idempotency.
+
+```mermaid
+flowchart LR
+    AST["Feature /<br>Function AST"] --> Calc["Compute<br>Test Budget"]
     Calc --> T1["Nominal Path (1)"]
     Calc --> T2["Branches & Guards (N)"]
     Calc --> T3["0-1-N Boundaries (1..3)"]
     Calc --> T4["Disturbance / Cancel (1)"]
-    T1 & T2 & T3 & T4 --> CompleteSuite["Exact Deterministic Test Matrix"]
+    T1 & T2 & T3 & T4 --> CompleteSuite["Exact Deterministic<br>Test Matrix"]
 ```
 
-   - **Deterministic 5-Question Mock Decision Tree**:
-     - Pass every candidate dependency through this 5-question tree before creating any mock or stub:
-       1. **Is the dependency internal to the current solution?** If yes, use the real component via DI or direct instantiation.
-       2. **Is it a database or persistent store?** If yes, use a real in-memory database (SQLite WAL or ephemeral instance).
-       3. **Is it system clock or non-deterministic time?** If yes, use a time abstraction (`TimeProvider` or time-machine).
-       4. **Is it an external 3rd-party HTTP API (e.g., Stripe, SendGrid)?** If yes, use a contract stub (`WireMock.Net` or `respx`). Never mock internal interfaces!
-       5. **Is it child process STDIO or an OS pipe?** If yes, use synthetic transport (`mock_stdio.js`) with fault injection.
-       - If you answer "No" to all five questions, **mocking is forbidden**. Use the real implementation.
+### Deterministic Five-Question Mock Decision Tree
+
+Pass every candidate collaborator through the [Five-Question Mock Decision Tree](../standards/TESTING_HARNESS_PATTERNS.md#deterministic-five-question-mock-decision-tree) before creating any mock or stub:
+
+1. **Is the dependency internal to the current solution?** If yes, use the real component via dependency injection or direct instantiation.
+2. **Is it a database or persistent store?** If yes, use a real in-memory database (SQLite WAL or ephemeral instance).
+3. **Is it the system clock or non-deterministic time?** If yes, use a time abstraction (`TimeProvider` or `time-machine`).
+4. **Is it an external third-party HTTP API (such as Stripe or SendGrid)?** If yes, use a contract stub (`WireMock.Net` or `respx`). Never mock internal interfaces.
+5. **Is it child process STDIO or an OS pipe?** If yes, use a synthetic transport (`mock_stdio.js`) with fault injection.
+
+If you answer **"No"** to all five questions, **mocking is forbidden**. Use the real implementation.
 
 ```mermaid
 flowchart TD
@@ -176,14 +155,37 @@ flowchart TD
     Q3 -- Yes --> UseTime["USE TIME ABSTRACTION<br/>(TimeProvider / time-machine)"]
     Q3 -- No --> Q4{"Is it an external 3rd-party<br/>HTTP API (e.g. Stripe)?"}
     
-    Q4 -- Yes --> UseWireMock["USE CONTRACT STUB<br/>(WireMock.Net / respx)<br/>NEVER Mock&lt;T&gt; interfaces!"]
+    Q4 -- Yes --> UseWireMock["USE CONTRACT STUB<br/>(WireMock.Net / respx)<br/>NEVER mock internal interfaces!"]
     Q4 -- No --> Q5{"Is it child process<br/>STDIO or OS Pipe?"}
     
     Q5 -- Yes --> UseSynth["USE SYNTHETIC TRANSPORT<br/>(mock_stdio.js with fault injection)"]
     Q5 -- No --> Banned["MOCKING FORBIDDEN<br/>Must use real implementation"]
 ```
 
-5. **Coverage Target**: Maintain $\ge$ 80% code coverage across unit, integration, and E2E suites. Do not count boilerplate or trivial POCO tests toward this goal.
-6. **UI Layout Inspection**: Frontends must pass the 4-point `playwright-layout-inspector` audit (no overflow, mobile fit, $\ge$ 24px targets, $\ge$ 85 score) with `data-testid` attributes.
-7. **6-Part Agent Feedback Envelope**: Format harness/test failures using the standardized diagnostic envelope: (1) `inputs`, (2) `assumptions`, (3) `active_settings`, (4) `action_history`, (5) `output_delta`, and (6) `captured_logs`, along with deterministic `reproduction_command` metadata.
-8. **Empirical Verification**: Never claim a task complete without running build, tests, verifying logs, and probing `/health`.
+### Coverage, UI Layout Audits, and Feedback Envelopes
+
+1. **Coverage Target**: Maintain **≥ 80% code coverage** across unit, integration, and end-to-end suites, excluding trivial POCO and DTO boilerplate.
+2. **UI Layout Inspection**: Verify that frontends pass the 4-point `playwright-layout-inspector` audit (zero overflow, mobile fit, ≥ 24px touch targets, ≥ 85 layout score; see [UI Layout Stability and Ergonomics Auditing](../standards/TESTING_HARNESS_PATTERNS.md#ui-layout-stability-and-ergonomics-auditing)).
+3. **Six-Part Agent Feedback Envelope**: Format all harness or test failures using the [Six-Part Agent Feedback Envelope](../standards/TESTING_HARNESS_PATTERNS.md#the-six-part-agent-feedback-envelope) (`inputs`, `assumptions`, `active_settings`, `action_history`, `output_delta`, `captured_logs`, and `reproduction_command`).
+4. **Empirical Verification**: Never claim a task is complete without running builds, executing tests, inspecting logs, and probing `/health`.
+
+---
+
+## Multi-Lens Code Review and Operational Guardrails
+
+### The Six Reviewer Foci and Requirements Traceability
+
+1. **Six Reviewer Foci**: Before opening or finalizing any Pull Request, evaluate the diff across all six lenses in [Multi-Lens Code Review and The Six Reviewer Foci](../standards/CODE_REVIEW_AND_GUARDRAILS.md#multi-lens-code-review-and-the-six-reviewer-foci):
+   - **Focus 1**: Requirement Traceability and Feature Preservation (`[Requirement(...)]` / `@requirement` annotations using `AUTH`, `DB`, `GUARD`, `MCP`, `SEC`, `TRANS`, `UI` taxonomy; zero feature deletions without instruction).
+   - **Focus 2**: Architecture, Modularity, and Safe Serialization (`≤ 500` LOC cap, `I*` interfaces, APIs First/MCP wrapper, and `JsonNode`/Pydantic manipulation instead of `string.Replace`).
+   - **Focus 3**: Anti-Test-Theatre and Live-Executor Isolation (real SQLite WAL / in-process transport, `0-1-N` boundaries, AST test budget, `pytest -m "not live"`).
+   - **Focus 4**: Security, Subprocess Safety, and Container Immutability (sanitized argument arrays without `shell=True`, `100% CancellationToken` propagation, AES-256-GCM encrypted secrets, immutable containers).
+   - **Focus 5**: UI Consistency, Layout Stability, and Real Screenshots (CSS variables, `scrollbar-gutter: stable`, 4-point Playwright layout audit, and real Playwright/Puppeteer screenshots in UI PRs).
+   - **Focus 6**: Living Documentation, Atomic Commits, and Release Sync (`README.md`/`ARCHITECTURE.md`/`docs/` updated, atomic Conventional Commits, lockstep version bump with the docs-only exception).
+2. **Requirements Traceability**: Annotate all new and modified tests and keep `REQUIREMENTS.md` synchronized with zero drift (see [Requirements Traceability and Living SRS Catalogs](../standards/CODE_REVIEW_AND_GUARDRAILS.md#requirements-traceability-and-living-srs-catalogs)).
+
+### Context Hygiene, Subprocess Safety, and Release Gates
+
+1. **Targeted File Search**: Never run unbounded `grep` or `ripgrep` across a repository root. Always scope searches using path prefixes or file globs (`include_pattern`) to avoid scanning build artifacts or lockfiles (see [Scoped Search and Context Window Hygiene](../standards/CODE_REVIEW_AND_GUARDRAILS.md#scoped-search-and-context-window-hygiene)).
+2. **Lockstep Version Sync and Docs-Only Exception**: Bump all project manifests, frontend version stores, and `CHANGELOG.md` simultaneously for code changes; skip version bumps and container rebuilds for documentation-only changes (see [Lockstep Version Sync and the Documentation-Only Exception](../standards/CODE_REVIEW_AND_GUARDRAILS.md#lockstep-version-sync-and-the-documentation-only-exception)).
+3. **Post-CI Verification and Dedicated Component Repos**: Always wait for GitHub Actions CI checks (`gh pr checks --watch`) to pass before finalizing PRs or pulling images, verify `/health` after container recreation, and always commit/PR standalone components from their dedicated repositories in `~/Repos/` (see [Post-CI Verification and Container Health Gates](../standards/CODE_REVIEW_AND_GUARDRAILS.md#post-ci-verification-and-container-health-gates)).
