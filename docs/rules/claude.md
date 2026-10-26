@@ -15,6 +15,7 @@ Always follow the complete guidelines in:
 - [**Universal Agent Rules (`AGENTS.md`)**](/rules/agents)
 - [**Master Engineering Style Guide**](/standards/engineering-style-guide)
 - [**Simulation and Control Harnesses**](/standards/testing-harness-patterns)
+- [**Code Review Foci and Operational Guardrails**](/standards/code-review-and-guardrails)
 
 ---
 
@@ -23,6 +24,7 @@ Always follow the complete guidelines in:
 - [**`engineering-archetype`**](/rules/skills#engineering-archetype-skill): Enforces master architectural standards across C#, Python, TypeScript, and C++.
 - [**`scaffold-project`**](/rules/skills#scaffold-project-skill): Scaffolds projects adhering to traditional Git Flow, living documentation, and 4-stage CI/CD.
 - [**`test-harness-builder`**](/rules/skills#test-harness-builder-skill): Builds closed-loop simulation harnesses, diagnostic tap points, Playwright UI drivers, and 6-part feedback envelopes.
+- [**`code-review-foci`**](/rules/skills#code-review-foci-skill): Runs a 6-focus read-only code review (Requirement Traceability, Architecture & Serialization, Anti-Test-Theatre, Security & Container Immutability, UI & Real Screenshots, and Living Docs & Release Sync).
 
 ---
 

@@ -10,8 +10,8 @@ This document explains the organization, design principles, consumption topology
 flowchart TD
     subgraph Toolbelt["AgenticEngineeringToolbelt Repository"]
         Archetypes["archetypes/<br>• 5 Polyglot profiles<br>• Controls, CLI, FastMCP, Vite UI, C++"]
-        Standards["standards/<br>• ENGINEERING_STYLE_GUIDE.md<br>• TESTING_HARNESS_PATTERNS.md<br>• CI_CD_PIPELINES.md"]
-        Skills[".agents/skills/<br>• engineering-archetype<br>• scaffold-project<br>• test-harness-builder"]
+        Standards["standards/<br>• ENGINEERING_STYLE_GUIDE.md<br>• TESTING_HARNESS_PATTERNS.md<br>• CI_CD_PIPELINES.md<br>• CODE_REVIEW_AND_GUARDRAILS.md"]
+        Skills[".agents/skills/<br>• engineering-archetype<br>• scaffold-project<br>• test-harness-builder<br>• code-review-foci"]
         Rules["rules/<br>• AGENTS.md (Universal)<br>• GEMINI.md (Antigravity)<br>• CLAUDE.md (Claude Code)"]
         Templates["templates/<br>• configs/<br>• docs/ (VitePress & Living Specs)<br>• workflows/ (4-stage CI/CD)<br>• scripts/"]
     end
@@ -49,6 +49,7 @@ The `standards/` directory provides canonical reference specifications for softw
 - [**Master Engineering Style Guide**](standards/ENGINEERING_STYLE_GUIDE.md): Foundational SOLID principles, naming rules, APIs First architecture, and polyglot stack conventions.
 - [**Simulation & Control Harnesses**](standards/TESTING_HARNESS_PATTERNS.md): Observable dynamic system design, the Four Pillars of Anti-Test Theatre, deterministic test budgets, and 6-part feedback envelopes.
 - [**Multi-Stage CI/CD Pipelines**](standards/CI_CD_PIPELINES.md): Four-stage GitHub Actions quality gate specification mapped to Git Flow branch triggers.
+- [**Code Review Foci & Operational Guardrails**](standards/CODE_REVIEW_AND_GUARDRAILS.md): Six orthogonal reviewer foci, formal requirement-to-test traceability (`AUTH`, `DB`, `GUARD`, `MCP`, `SEC`, `TRANS`, `UI`), and context/deployment guardrails.
 - [**Technical Writing Standards**](docs/standards/asd-ste100.md): Simplified Technical English (ASD-STE100) and Google Developer Documentation Style Guide rules.
 
 ### Executable Agent Skills
@@ -57,6 +58,7 @@ The `.agents/skills/` directory provides executable skill manifests for AI agent
 - [**`engineering-archetype`**](.agents/skills/engineering-archetype/SKILL.md): Guides agents on architectural standards, proactive clarification, and iterative verification.
 - [**`test-harness-builder`**](.agents/skills/test-harness-builder/SKILL.md): Generates stress loops, synthetic STDIO transports, diagnostic tap points, and 6-part feedback envelopes.
 - [**`scaffold-project`**](.agents/skills/scaffold-project/SKILL.md): Automates project scaffolding with Git Flow branches, VitePress docs, and 4-stage CI/CD workflows.
+- [**`code-review-foci`**](.agents/skills/code-review-foci/SKILL.md): Runs a 6-focus read-only code review before opening or finalizing a pull request.
 
 ### Agent Context Rules
 
@@ -68,9 +70,9 @@ The `rules/` directory contains drop-in prompt rule files that enforce engineeri
 ### Project Templates
 
 The `templates/` directory supplies reusable configuration boilerplates, documentation starters, workflows, and verification scripts:
-- **`configs/`**: `Directory.Build.props`, `vite.config.ts`, `tsconfig.json`, `eslint.config.js`, `playwright.config.ts`, `vcpkg.json`, and `pyproject.toml`.
+- **`configs/`**: `Directory.Build.props`, `vite.config.ts`, `tsconfig.json`, `eslint.config.js`, `playwright.config.ts`, `vcpkg.json`, `pyproject.toml`, and `dependabot.yml`.
 - **`docs/`**: Starter [`ARCHITECTURE.md`](templates/docs/ARCHITECTURE.md), [`REQUIREMENTS.md`](templates/docs/REQUIREMENTS.md), [`CHANGELOG.md`](templates/docs/CHANGELOG.md), and VitePress configuration.
-- **`workflows/`**: Four-stage [`ci.yml`](templates/workflows/ci.yml), [`codeql.yml`](templates/workflows/codeql.yml), [`deploy-docs.yml`](templates/workflows/deploy-docs.yml), and [`release.yml`](templates/workflows/release.yml).
+- **`workflows/`**: Four-stage [`ci.yml`](templates/workflows/ci.yml), [`codeql.yml`](templates/workflows/codeql.yml), [`dependency-review.yml`](templates/workflows/dependency-review.yml), [`deploy-docs.yml`](templates/workflows/deploy-docs.yml), and [`release.yml`](templates/workflows/release.yml).
 - **`scripts/`**: [`commit.sh`](templates/scripts/commit.sh), [`git-flow-release.sh`](templates/scripts/git-flow-release.sh), and [`verify_release.py`](templates/scripts/verify_release.py).
 
 ---
@@ -156,6 +158,9 @@ Every guide in the toolbelt organizes topics under dedicated `H2` and `H3` heade
 | | [The Six-Part Agent Feedback Envelope](standards/TESTING_HARNESS_PATTERNS.md#the-six-part-agent-feedback-envelope) | Standardized JSON diagnostic payload (`inputs`, `assumptions`, `active_settings`, `action_history`, `output_delta`, `captured_logs`). | [`ENGINEERING_STYLE_GUIDE.md`](standards/ENGINEERING_STYLE_GUIDE.md#standardized-six-part-feedback-envelope), [`AGENTS.md`](rules/AGENTS.md#coverage-ui-layout-audits-and-feedback-envelopes) |
 | | [Polyglot Harness Recipes](standards/TESTING_HARNESS_PATTERNS.md#polyglot-archetype-test-harness-recipes) | Concrete integration harness implementations for C#, Python, React/TS, and C++. | All 5 archetype guides and [`ENGINEERING_STYLE_GUIDE.md`](standards/ENGINEERING_STYLE_GUIDE.md#anti-test-theatre-and-deterministic-budgets) |
 | [**CI/CD Pipelines**](standards/CI_CD_PIPELINES.md) | [Git Flow Trigger Matrix](standards/CI_CD_PIPELINES.md#git-flow-trigger-matrix) & [Stage Descriptions](standards/CI_CD_PIPELINES.md#stage-descriptions) | Branch-to-stage mapping across Integrity, Build & Test, Smoke, and Release gates. | [`ENGINEERING_STYLE_GUIDE.md`](standards/ENGINEERING_STYLE_GUIDE.md#four-stage-github-actions-ci-cd-pipeline), [`ARCHITECTURE.md`](ARCHITECTURE.md#traditional-git-flow-and-release-model) |
+| [**Code Review & Guardrails**](standards/CODE_REVIEW_AND_GUARDRAILS.md) | [The Six Reviewer Foci](standards/CODE_REVIEW_AND_GUARDRAILS.md#multi-lens-code-review-and-the-six-reviewer-foci) | Orthogonal review lenses: Requirements, Architecture/JSON, Anti-Test-Theatre, Security/Subprocess, UI/Screenshots, Docs/Release. | [`AGENTS.md`](rules/AGENTS.md#multi-lens-code-review-and-operational-guardrails), [`code-review-foci`](.agents/skills/code-review-foci/SKILL.md) |
+| | [Requirements Traceability](standards/CODE_REVIEW_AND_GUARDRAILS.md#requirements-traceability-and-living-srs-catalogs) | Category codes (`AUTH`, `DB`, `GUARD`, `MCP`, `SEC`, `TRANS`, `UI`), polyglot test annotations, zero-drift SRS catalog. | [`AGENTS.md`](rules/AGENTS.md#the-six-reviewer-foci-and-requirements-traceability), [`REQUIREMENTS.md`](templates/docs/REQUIREMENTS.md) |
+| | [Operational & Deployment Guardrails](standards/CODE_REVIEW_AND_GUARDRAILS.md#operational-context-and-deployment-guardrails) | Scoped file search, lockstep version bump + docs-only exception, post-CI `/health` probe, dedicated component repo boundaries. | [`AGENTS.md`](rules/AGENTS.md#context-hygiene-subprocess-safety-and-release-gates), [`CLAUDE.md`](rules/CLAUDE.md), [`GEMINI.md`](rules/GEMINI.md) |
 | [**Technical Writing Standards**](docs/standards/asd-ste100.md) | [Core Writing Rules](docs/standards/asd-ste100.md#core-writing-rules) & [Structural Rules](docs/standards/asd-ste100.md#structural-and-formatting-rules) | ASD-STE100 and Google Developer Documentation Style Guide rules, section-scoped links, clean numeric symbols. | [`ENGINEERING_STYLE_GUIDE.md`](standards/ENGINEERING_STYLE_GUIDE.md#living-documentation-and-automation), [`AGENTS.md`](rules/AGENTS.md#technical-writing-and-living-documentation) |
 
 ---

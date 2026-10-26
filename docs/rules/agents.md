@@ -199,3 +199,24 @@ flowchart TD
 2. **UI Layout Inspection**: Verify that frontends pass the 4-point `playwright-layout-inspector` audit (zero overflow, mobile fit, ≥ 24px touch targets, ≥ 85 layout score; see [UI Layout Stability and Ergonomics Auditing](/standards/testing-harness-patterns#ui-layout-stability-and-ergonomics-auditing)).
 3. **Six-Part Agent Feedback Envelope**: Format all harness or test failures using the [Six-Part Agent Feedback Envelope](/standards/testing-harness-patterns#the-six-part-agent-feedback-envelope) (`inputs`, `assumptions`, `active_settings`, `action_history`, `output_delta`, `captured_logs`, and `reproduction_command`).
 4. **Empirical Verification**: Never claim a task is complete without running builds, executing tests, inspecting logs, and probing `/health`.
+
+---
+
+## Multi-Lens Code Review and Operational Guardrails
+
+### The Six Reviewer Foci and Requirements Traceability
+
+1. **Six Reviewer Foci**: Before opening or finalizing any Pull Request, evaluate the diff across all six lenses in [Multi-Lens Code Review and The Six Reviewer Foci](/standards/code-review-and-guardrails#multi-lens-code-review-and-the-six-reviewer-foci):
+   - **Focus 1**: Requirement Traceability and Feature Preservation (`[Requirement(...)]` / `@requirement` annotations using `AUTH`, `DB`, `GUARD`, `MCP`, `SEC`, `TRANS`, `UI` taxonomy; zero feature deletions without instruction).
+   - **Focus 2**: Architecture, Modularity, and Safe Serialization (`≤ 500` LOC cap, `I*` interfaces, APIs First/MCP wrapper, and `JsonNode`/Pydantic manipulation instead of `string.Replace`).
+   - **Focus 3**: Anti-Test-Theatre and Live-Executor Isolation (real SQLite WAL / in-process transport, `0-1-N` boundaries, AST test budget, `pytest -m "not live"`).
+   - **Focus 4**: Security, Subprocess Safety, and Container Immutability (sanitized argument arrays without `shell=True`, `100% CancellationToken` propagation, AES-256-GCM encrypted secrets, immutable containers).
+   - **Focus 5**: UI Consistency, Layout Stability, and Real Screenshots (CSS variables, `scrollbar-gutter: stable`, 4-point Playwright layout audit, and real Playwright/Puppeteer screenshots in UI PRs).
+   - **Focus 6**: Living Documentation, Atomic Commits, and Release Sync (`README.md`/`ARCHITECTURE.md`/`docs/` updated, atomic Conventional Commits, lockstep version bump with the docs-only exception).
+2. **Requirements Traceability**: Annotate all new and modified tests and keep `REQUIREMENTS.md` synchronized with zero drift (see [Requirements Traceability and Living SRS Catalogs](/standards/code-review-and-guardrails#requirements-traceability-and-living-srs-catalogs)).
+
+### Context Hygiene, Subprocess Safety, and Release Gates
+
+1. **Targeted File Search**: Never run unbounded `grep` or `ripgrep` across a repository root. Always scope searches using path prefixes or file globs (`include_pattern`) to avoid scanning build artifacts or lockfiles (see [Scoped Search and Context Window Hygiene](/standards/code-review-and-guardrails#scoped-search-and-context-window-hygiene)).
+2. **Lockstep Version Sync and Docs-Only Exception**: Bump all project manifests, frontend version stores, and `CHANGELOG.md` simultaneously for code changes; skip version bumps and container rebuilds for documentation-only changes (see [Lockstep Version Sync and the Documentation-Only Exception](/standards/code-review-and-guardrails#lockstep-version-sync-and-the-documentation-only-exception)).
+3. **Post-CI Verification and Dedicated Component Repos**: Always wait for GitHub Actions CI checks (`gh pr checks --watch`) to pass before finalizing PRs or pulling images, verify `/health` after container recreation, and always commit/PR standalone components from their dedicated repositories in `~/Repos/` (see [Post-CI Verification and Container Health Gates](/standards/code-review-and-guardrails#post-ci-verification-and-container-health-gates)).

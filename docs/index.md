@@ -37,9 +37,9 @@ The following diagram illustrates how autonomous agents and consumer software re
 ```mermaid
 flowchart TD
     subgraph Toolbelt["AgenticEngineeringToolbelt Repository"]
-        Standards["standards/<br>• Style Guide<br>• Simulation Harnesses<br>• CI/CD Pipelines<br>• Technical Writing Guide"]
+        Standards["standards/<br>• Style Guide<br>• Simulation Harnesses<br>• CI/CD Pipelines<br>• Code Review & Guardrails"]
         Archetypes["archetypes/<br>• .NET CLI<br>• Controls Fullstack<br>• C++ Native<br>• Python FastAPI<br>• React UI"]
-        Skills[".agents/skills/<br>• engineering-archetype<br>• scaffold-project<br>• test-harness-builder"]
+        Skills[".agents/skills/<br>• engineering-archetype<br>• scaffold-project<br>• test-harness-builder<br>• code-review-foci"]
         Rules["rules/<br>• AGENTS.md<br>• GEMINI.md<br>• CLAUDE.md"]
         Templates["templates/<br>• configs/<br>• docs/<br>• workflows/<br>• scripts/"]
     end
@@ -101,6 +101,6 @@ npm run docs:build
 | Section | Focus Area | Primary Entry Points |
 | :--- | :--- | :--- |
 | **Architecture & Map** | Subsystem topology, Git Flow model, and cross-linking map. | [System Architecture & Documentation Map](/architecture) |
-| **Engineering Standards** | Core architectural rules, simulation harnesses, and CI/CD gates. | [Master Engineering Style Guide](/standards/engineering-style-guide) • [Simulation & Control Harnesses](/standards/testing-harness-patterns) • [Multi-Stage CI/CD Pipelines](/standards/ci-cd-pipelines) |
+| **Engineering Standards** | Core architectural rules, simulation harnesses, review foci, and CI/CD gates. | [Master Engineering Style Guide](/standards/engineering-style-guide) • [Simulation & Control Harnesses](/standards/testing-harness-patterns) • [Multi-Stage CI/CD Pipelines](/standards/ci-cd-pipelines) • [Code Review & Guardrails](/standards/code-review-and-guardrails) |
 | **Polyglot Archetypes** | Complete stack blueprints across C#, Python, TypeScript, and C++. | [Archetypes Catalog](/archetypes/) • [Fullstack (.NET + React)](/archetypes/fullstack-dotnet-react) • [.NET Console & CLI](/archetypes/console-cli-dotnet) • [Python FastAPI & FastMCP](/archetypes/python-fastapi-mcp) • [React, TS & Vite UI](/archetypes/react-ts-vite-ui) • [C++ Native Algorithms](/archetypes/native-cpp-algorithms) |
 | **Agent Rules & Skills** | Drop-in agent context files and executable skill manifests. | [Rules & Context Overview](/rules/) • [Universal Agent Rules (AGENTS.md)](/rules/agents) • [Executable Skills](/rules/skills) |

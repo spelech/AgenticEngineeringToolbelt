@@ -16,7 +16,7 @@ The toolbelt provides standardized prompt rules, context manifests, and executab
 | **`AGENTS.md`** | Universal (All Agents & IDEs) | Git Flow, APIs First, SOLID modularity, polyglot matrix, and anti-test-theatre verification. | [Universal Agent Rules](/rules/agents) |
 | **`CLAUDE.md`** | Claude Code | Runtime execution tenets, skill bindings, and deterministic verification links. | [Claude Code Rules](/rules/claude) |
 | **`GEMINI.md`** | Google Antigravity & Gemini CLI | Tool orchestration, workspace discipline, and simulation harness requirements. | [Antigravity & Gemini Rules](/rules/gemini) |
-| **`.agents/skills/`** | Antigravity, Claude Code, Cursor | Executable skills for project scaffolding, archetype enforcement, and harness generation. | [Toolbelt Skills Manifests](/rules/skills) |
+| **`.agents/skills/`** | Antigravity, Claude Code, Cursor | Executable skills for project scaffolding, archetype enforcement, harness generation, and 6-focus code reviews. | [Toolbelt Skills Manifests](/rules/skills) |
 
 ---
 

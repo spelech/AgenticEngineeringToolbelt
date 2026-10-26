@@ -86,6 +86,16 @@ export default withMermaid(
               ]
             },
             {
+              text: 'Code Review & Guardrails',
+              link: '/standards/code-review-and-guardrails',
+              collapsed: true,
+              items: [
+                { text: 'The Six Reviewer Foci', link: '/standards/code-review-and-guardrails#multi-lens-code-review-and-the-six-reviewer-foci' },
+                { text: 'Requirements Traceability', link: '/standards/code-review-and-guardrails#requirements-traceability-and-living-srs-catalogs' },
+                { text: 'Operational Guardrails', link: '/standards/code-review-and-guardrails#operational-context-and-deployment-guardrails' }
+              ]
+            },
+            {
               text: 'Technical Writing Standards',
               link: '/standards/asd-ste100',
               collapsed: true,
@@ -169,7 +179,8 @@ export default withMermaid(
                 { text: 'Collaboration & Workflow', link: '/rules/agents#collaboration-and-workflow-discipline' },
                 { text: 'Code & Architecture', link: '/rules/agents#core-code-and-architectural-discipline' },
                 { text: 'Polyglot Matrix', link: '/rules/agents#polyglot-language-matrix' },
-                { text: 'Testing & Verification', link: '/rules/agents#testing-and-agent-verification-protocol' }
+                { text: 'Testing & Verification', link: '/rules/agents#testing-and-agent-verification-protocol' },
+                { text: 'Code Review & Guardrails', link: '/rules/agents#multi-lens-code-review-and-operational-guardrails' }
               ]
             },
             { text: 'Claude Code (CLAUDE.md)', link: '/rules/claude' },
