@@ -6,7 +6,7 @@ REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 echo "🛠️ Installing AgenticEngineeringToolbelt skills into agent directories..."
 
-SKILLS=("engineering-archetype" "scaffold-project" "test-harness-builder" "code-review-foci")
+SKILLS=("engineering-archetype" "scaffold-project" "test-harness-builder" "code-review-foci" "mermaid-live")
 
 # 1. Antigravity / Gemini CLI
 GEMINI_SKILLS_DIR="$HOME/.gemini/antigravity-cli/skills"
